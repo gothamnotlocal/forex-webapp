@@ -7,78 +7,91 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   /* ============================================
-     🎨 ЗОНА НАСТРОЙКИ ЦВЕТОВ — меняй только тут
+     🎨 ЧЕРНО-БЕЛЫЙ ГРАДИЕНТ ПЕРЕЛИВАЮЩИЙСЯ
      ============================================ */
   :root {
     color-scheme: light dark;
 
-    /* Динамический градиент */
-    --g1: #00d4ff;
-    --g2: #7c3aed;
-    --g3: #ec4899;
-
-    --accent-1: linear-gradient(135deg, #00d4ff, #7c3aed);
-    --accent-2: linear-gradient(135deg, #7c3aed, #ec4899);
-
-    --bg-color: #0a0e27;
-    --bg-glow-1: #1e1b4b;
-    --bg-glow-2: #0f0a1e;
-    --card-bg: rgba(124, 58, 237, 0.08);
+    --bg-color: #0a0a0a;
+    --bg-light: #1a1a1a;
     --text-color: #ffffff;
-    --hint-color: #a8adba;
-
-    --gradient-speed: 6s;
+    --text-dim: #b0b0b0;
+    --accent: #ffffff;
+    --border-color: rgba(255, 255, 255, 0.1);
   }
-  /* ============================================ */
 
   * { box-sizing: border-box; }
   
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
-    color: var(--tg-theme-text-color, var(--text-color));
+    color: var(--text-color);
     margin: 0;
-    padding: 16px;
+    padding: 0;
     -webkit-tap-highlight-color: transparent;
     min-height: 100vh;
-    background-color: var(--tg-theme-bg-color, var(--bg-color));
-    background-image:
-      radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.25) 0%, transparent 50%),
-      radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 60%);
-    background-attachment: fixed;
-    background-size: 200% 200%;
-    animation: bgShift 15s ease-in-out infinite;
+    background: var(--bg-color);
+    overflow-x: hidden;
   }
 
-  @keyframes bgShift {
-    0%, 100% { background-position: 0% 0%; }
-    50% { background-position: 100% 100%; }
+  /* Анимированный градиент на фоне */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, #000000, #1a1a1a, #ffffff, #2a2a2a, #000000);
+    background-size: 400% 400%;
+    animation: bgGradient 12s ease infinite;
+    z-index: -1;
+    opacity: 0.3;
+  }
+
+  @keyframes bgGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
   .header {
     text-align: center;
-    margin-bottom: 24px;
+    padding: 20px 16px 0 16px;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
   }
 
   .header h1 {
-    font-size: 28px;
-    margin: 0 0 8px 0;
-    background: linear-gradient(135deg, #00d4ff, #7c3aed, #ec4899);
-    background-size: 300% 300%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: gradientShift var(--gradient-speed) ease infinite;
+    font-size: 32px;
+    margin: 0 0 4px 0;
+    color: var(--text-color);
     font-weight: 900;
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   .header p {
-    color: var(--tg-theme-hint-color, var(--hint-color));
-    font-size: 13.5px;
+    color: var(--text-dim);
+    font-size: 13px;
     margin: 0;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 0.3px;
+  }
+
+  /* LIVE TICKER С ВАЛЮТНЫМИ ПАРАМИ */
+  .live-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, #ffffff, #808080, #000000);
+    background-size: 200% 200%;
+    animation: gradientShift 2s ease infinite;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 900;
+    color: #000;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
   }
 
   @keyframes gradientShift {
@@ -87,48 +100,131 @@
     100% { background-position: 0% 50%; }
   }
 
-  /* Вкладки категорий активов */
-  .tabs {
-    display: flex;
-    gap: 8px;
+  .ticker-wrap {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 0;
     margin-bottom: 20px;
-    background: rgba(255,255,255,0.03);
-    padding: 6px;
-    border-radius: 16px;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(124, 58, 237, 0.1);
   }
 
-  .tab {
-    flex: 1;
-    text-align: center;
-    padding: 12px 8px;
-    border-radius: 12px;
+  .ticker-track {
+    display: inline-block;
+    animation: ticker-scroll 50s linear infinite;
+    white-space: nowrap;
+  }
+
+  .ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 24px;
     font-size: 13px;
     font-weight: 700;
-    color: var(--tg-theme-hint-color, var(--hint-color));
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text-dim);
     letter-spacing: 0.2px;
   }
 
-  .tab.active {
-    background: linear-gradient(135deg, #00d4ff, #7c3aed);
-    color: #0a0e27;
-    box-shadow: 0 8px 32px rgba(0, 212, 255, 0.25);
-    transform: translateY(-2px);
+  .ticker-item .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.6;
+    animation: dotBlink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes dotBlink {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Основной контент */
+  .container {
+    padding: 0 16px 20px 16px;
+    position: relative;
+    z-index: 1;
   }
 
   .section-label {
     font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--tg-theme-hint-color, var(--hint-color));
-    margin: 20px 0 12px 4px;
-    font-weight: 800;
-    opacity: 0.7;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin: 20px 0 12px 0;
+    font-weight: 900;
+    opacity: 0.6;
   }
 
+  /* Вкладки */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 6px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+  }
+
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.2px;
+  }
+
+  .tab:hover {
+    color: var(--text-color);
+  }
+
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg-color);
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.15);
+  }
+
+  /* Поиск */
+  .search-box {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-color);
+    font-size: 14px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(5px);
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+
+  .search-box::placeholder {
+    color: var(--text-dim);
+  }
+
+  .search-box:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.1);
+  }
+
+  /* Сетка активов */
   .asset-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -137,54 +233,55 @@
   }
 
   .asset-card {
-    padding: 14px 12px;
-    border-radius: 14px;
-    background: rgba(124, 58, 237, 0.06);
-    border: 1.5px solid rgba(124, 58, 237, 0.2);
+    padding: 12px 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1.5px solid var(--border-color);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(5px);
   }
 
   .asset-card:hover {
-    border-color: rgba(124, 58, 237, 0.4);
-    background: rgba(124, 58, 237, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.06);
     transform: translateY(-2px);
   }
 
   .asset-card .icon {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .asset-card .name {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.2px;
   }
 
   .asset-card.selected {
-    border: 2px solid #00d4ff;
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(124, 58, 237, 0.1));
-    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+    border: 2px solid var(--accent);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
   }
 
+  /* Таймфрейм */
   .tf-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
   }
 
   .tf-card {
     text-align: center;
-    padding: 12px 6px;
-    border-radius: 12px;
-    background: rgba(124, 58, 237, 0.06);
-    border: 1.5px solid rgba(124, 58, 237, 0.2);
-    font-size: 14px;
+    padding: 11px 6px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1.5px solid var(--border-color);
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -192,248 +289,73 @@
   }
 
   .tf-card:hover {
-    border-color: rgba(124, 58, 237, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
   }
 
   .tf-card.selected {
-    border: 2px solid #00d4ff;
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(124, 58, 237, 0.1));
-    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+    border: 2px solid var(--accent);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
   }
 
+  /* Кнопки */
   .submit-btn {
-    margin-top: 28px;
+    margin-top: 20px;
     width: 100%;
-    padding: 16px;
+    padding: 15px;
     font-size: 16px;
     font-weight: 900;
-    border: none;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #00d4ff, #7c3aed, #ec4899);
-    background-size: 300% 300%;
+    border: 2px solid var(--accent);
+    border-radius: 14px;
+    background: var(--accent);
     color: var(--bg-color);
-    box-shadow: 0 12px 40px rgba(0, 212, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    animation: gradientShift var(--gradient-speed) ease infinite;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     letter-spacing: 0.5px;
+  }
+
+  .submit-btn:hover {
+    box-shadow: 0 12px 32px rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
   }
 
   .submit-btn:active {
     transform: scale(0.96);
   }
 
-  .search-box {
-    width: 100%;
-    padding: 14px 16px;
-    border-radius: 12px;
-    background: rgba(124, 58, 237, 0.08);
-    border: 1.5px solid rgba(124, 58, 237, 0.2);
-    color: var(--text-color);
-    font-size: 14px;
-    margin-bottom: 14px;
-    backdrop-filter: blur(5px);
-    transition: all 0.2s;
-  }
-
-  .search-box::placeholder {
-    color: var(--hint-color);
-  }
-
-  .search-box:focus {
-    outline: none;
-    border-color: #00d4ff;
-    background: rgba(124, 58, 237, 0.12);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
-  }
-
-  .ticker-wrap {
-    overflow: hidden;
-    white-space: nowrap;
-    background: rgba(124, 58, 237, 0.08);
-    border-radius: 12px;
-    padding: 10px 0;
-    margin-bottom: 20px;
-    border: 1px solid rgba(124, 58, 237, 0.15);
-    backdrop-filter: blur(5px);
-  }
-
-  .ticker-track {
-    display: inline-block;
-    animation: ticker-scroll 30s linear infinite;
-  }
-
-  .ticker-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 20px;
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--hint-color);
-    letter-spacing: 0.2px;
-  }
-
-  .ticker-item .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #00d4ff, #7c3aed);
-    animation: dotPulse 2s ease-in-out infinite;
-  }
-
-  @keyframes dotPulse {
-    0%, 100% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.2); }
-  }
-
-  @keyframes ticker-scroll {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-
   .scan-btn {
     width: 100%;
-    padding: 14px;
-    margin-top: 12px;
-    border-radius: 14px;
-    border: 1.5px solid rgba(124, 58, 237, 0.3);
-    background: rgba(124, 58, 237, 0.08);
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.04);
     color: var(--text-color);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(5px);
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
   }
 
   .scan-btn:hover {
-    border-color: rgba(124, 58, 237, 0.5);
-    background: rgba(124, 58, 237, 0.12);
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
   }
 
   .scan-btn:active {
     transform: scale(0.96);
   }
 
-  /* ===== Экран результатов скана ===== */
-  .scan-sheet {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: 40px;
-    background: var(--bg-color);
-    border-top-left-radius: 28px;
-    border-top-right-radius: 28px;
-    padding: 24px 20px 28px;
-    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.6);
-    transform: translateY(100%);
-    transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
-    z-index: 60;
-    border-top: 1px solid rgba(124, 58, 237, 0.2);
-    overflow-y: auto;
-    backdrop-filter: blur(20px);
-  }
-
-  .scan-sheet.active {
-    transform: translateY(0);
-  }
-
-  .scan-sheet .handle {
-    width: 40px;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(124, 58, 237, 0.3);
-    margin: 0 auto 18px;
-  }
-
-  .scan-sheet h2 {
-    font-size: 22px;
-    font-weight: 900;
-    margin: 0 0 6px 0;
-    text-align: center;
-    background: linear-gradient(135deg, #00d4ff, #7c3aed);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.5px;
-  }
-
-  .scan-sheet .scan-sub {
-    text-align: center;
-    font-size: 13px;
-    color: var(--hint-color);
-    margin-bottom: 20px;
-    font-weight: 600;
-  }
-
-  .scan-result-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 16px;
-    border-radius: 14px;
-    background: rgba(124, 58, 237, 0.06);
-    border: 1px solid rgba(124, 58, 237, 0.15);
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(5px);
-  }
-
-  .scan-result-item:hover {
-    border-color: rgba(124, 58, 237, 0.3);
-    background: rgba(124, 58, 237, 0.1);
-    transform: translateY(-2px);
-  }
-
-  .scan-result-item .name {
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: -0.3px;
-  }
-
-  .scan-result-item .meta {
-    font-size: 12px;
-    color: var(--hint-color);
-    margin-top: 4px;
-  }
-
-  .scan-result-item .badge {
-    padding: 8px 14px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 900;
-    color: #fff;
-    letter-spacing: 0.3px;
-  }
-
-  .scan-result-item .badge.buy {
-    background: linear-gradient(135deg, #00d4ff, #00a8cc);
-    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.3);
-  }
-
-  .scan-result-item .badge.sell {
-    background: linear-gradient(135deg, #ec4899, #be185d);
-    box-shadow: 0 6px 20px rgba(236, 72, 153, 0.3);
-  }
-
-  .scan-empty {
-    text-align: center;
-    color: var(--hint-color);
-    font-size: 14px;
-    padding: 40px 20px;
-    line-height: 1.6;
-  }
-
-  /* ===== Экран загрузки ===== */
+  /* ===== ЭКРАН ЗАГРУЗКИ ===== */
   .loading-screen {
     position: fixed;
     inset: 0;
@@ -441,10 +363,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(10, 14, 39, 0.95), rgba(15, 10, 30, 0.95));
+    background: rgba(10, 10, 10, 0.95);
     z-index: 50;
     gap: 20px;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
   }
 
   .loading-screen.active {
@@ -452,8 +374,8 @@
   }
 
   .ring-loader {
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
     position: relative;
   }
 
@@ -463,30 +385,20 @@
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    border: 3px solid transparent;
+    border: 2.5px solid transparent;
   }
 
   .ring-loader::before {
-    border-top-color: #00d4ff;
-    border-right-color: #7c3aed;
-    filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.5));
-    animation: ring-spin 1s linear infinite;
+    border-top-color: var(--accent);
+    border-right-color: rgba(255, 255, 255, 0.4);
+    animation: ring-spin 2s linear infinite;
   }
 
   .ring-loader::after {
-    inset: 12px;
-    border-bottom-color: #ec4899;
-    border-left-color: #00d4ff;
-    filter: drop-shadow(0 0 8px rgba(124, 58, 237, 0.4));
-    animation: ring-spin-rev 1.6s linear infinite;
-  }
-
-  .ring-core {
-    position: absolute;
-    inset: 30px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(0, 212, 255, 0.15), transparent 70%);
-    animation: ring-pulse 1.4s ease-in-out infinite;
+    inset: 8px;
+    border-bottom-color: var(--accent);
+    border-left-color: rgba(255, 255, 255, 0.3);
+    animation: ring-spin-rev 2.5s linear infinite;
   }
 
   @keyframes ring-spin {
@@ -499,11 +411,6 @@
     to { transform: rotate(0deg); }
   }
 
-  @keyframes ring-pulse {
-    0%, 100% { opacity: 0.4; transform: scale(0.9); }
-    50% { opacity: 1; transform: scale(1.1); }
-  }
-
   .loading-title {
     font-size: 18px;
     font-weight: 900;
@@ -511,29 +418,130 @@
   }
 
   .loading-sub {
-    font-size: 13.5px;
-    color: var(--hint-color);
+    font-size: 13px;
+    color: var(--text-dim);
     text-align: center;
     min-height: 20px;
     font-weight: 600;
   }
 
-  /* ===== Карточка результата ===== */
+  /* ===== РЕЗУЛЬТАТЫ СКАНА ===== */
+  .scan-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    background: rgba(10, 10, 10, 0.95);
+    border-radius: 0;
+    padding: 40px 16px 24px 16px;
+    box-shadow: none;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+    z-index: 60;
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+  }
+
+  .scan-sheet.active {
+    transform: translateY(0);
+  }
+
+  .scan-sheet .handle {
+    display: none;
+  }
+
+  .scan-sheet h2 {
+    font-size: 24px;
+    font-weight: 900;
+    margin: 0 0 6px 0;
+    text-align: center;
+    letter-spacing: -0.5px;
+  }
+
+  .scan-sheet .scan-sub {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  .scan-result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(5px);
+  }
+
+  .scan-result-item:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .scan-result-item .name {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+  }
+
+  .scan-result-item .meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 3px;
+  }
+
+  .scan-result-item .badge {
+    padding: 6px 12px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--bg-color);
+    letter-spacing: 0.3px;
+  }
+
+  .scan-result-item .badge.buy {
+    background: var(--accent);
+  }
+
+  .scan-result-item .badge.sell {
+    background: rgba(255, 255, 255, 0.3);
+    color: var(--text-color);
+  }
+
+  .scan-empty {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 14px;
+    padding: 50px 20px;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+
+  /* ===== КАРТОЧКА РЕЗУЛЬТАТА ===== */
   .result-sheet {
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--bg-color);
-    border-top-left-radius: 28px;
-    border-top-right-radius: 28px;
-    padding: 28px 20px 32px;
-    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.6);
+    background: rgba(10, 10, 10, 0.98);
+    border-radius: 0;
+    padding: 32px 16px 28px;
+    box-shadow: none;
     transform: translateY(100%);
     transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
     z-index: 60;
-    border-top: 1px solid rgba(124, 58, 237, 0.2);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
+    max-height: 90vh;
+    overflow-y: auto;
   }
 
   .result-sheet.active {
@@ -541,63 +549,56 @@
   }
 
   .result-sheet .handle {
-    width: 40px;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(124, 58, 237, 0.3);
-    margin: 0 auto 20px;
+    display: none;
   }
 
   .result-status {
     text-align: center;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 900;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    background: linear-gradient(135deg, #00d4ff, #7c3aed);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 12px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
   }
 
   .result-pair {
     text-align: center;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 900;
     margin-bottom: 6px;
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
   }
 
   .result-confidence {
     text-align: center;
     font-size: 13px;
-    color: var(--hint-color);
-    margin-bottom: 22px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
     font-weight: 600;
   }
 
   .result-action-btn {
     width: 100%;
-    padding: 20px;
-    border-radius: 16px;
-    border: none;
-    font-size: 20px;
+    padding: 18px;
+    border-radius: 14px;
+    border: 2px solid var(--accent);
+    font-size: 18px;
     font-weight: 900;
     letter-spacing: 0.5px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 6px;
-    color: #ffffff;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .result-action-btn.buy {
-    background: linear-gradient(135deg, #00d4ff, #0099cc);
-    box-shadow: 0 12px 40px rgba(0, 212, 255, 0.35);
+    background: var(--accent);
+    color: var(--bg-color);
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
   }
 
   .result-action-btn.buy:active {
@@ -605,8 +606,9 @@
   }
 
   .result-action-btn.sell {
-    background: linear-gradient(135deg, #ec4899, #be185d);
-    box-shadow: 0 12px 40px rgba(236, 72, 153, 0.35);
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-color);
+    border-color: rgba(255, 255, 255, 0.3);
   }
 
   .result-action-btn.sell:active {
@@ -614,26 +616,26 @@
   }
 
   .result-action-btn.neutral {
-    background: rgba(124, 58, 237, 0.15);
-    color: var(--hint-color);
-    box-shadow: none;
+    background: transparent;
+    color: var(--text-dim);
+    border-color: var(--border-color);
   }
 
   .result-info {
-    background: rgba(124, 58, 237, 0.08);
-    border-radius: 14px;
-    padding: 4px 16px;
-    margin-bottom: 18px;
-    border: 1px solid rgba(124, 58, 237, 0.15);
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    padding: 4px 14px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border-color);
     backdrop-filter: blur(5px);
   }
 
   .result-info-row {
     display: flex;
     justify-content: space-between;
-    padding: 12px 0;
-    font-size: 14px;
-    border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+    padding: 11px 0;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .result-info-row:last-child {
@@ -641,8 +643,8 @@
   }
 
   .result-info-row .label {
-    color: var(--hint-color);
-    font-weight: 600;
+    color: var(--text-dim);
+    font-weight: 700;
   }
 
   .result-info-row .value {
@@ -651,55 +653,93 @@
   }
 
   .result-reason {
-    font-size: 12.5px;
-    color: var(--hint-color);
+    font-size: 12px;
+    color: var(--text-dim);
     line-height: 1.7;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     white-space: pre-line;
-    background: rgba(124, 58, 237, 0.06);
-    padding: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 11px;
     border-radius: 10px;
-    border-left: 3px solid rgba(0, 212, 255, 0.3);
+    border-left: 3px solid rgba(255, 255, 255, 0.2);
+    font-weight: 600;
   }
 
   .result-close-btn {
     width: 100%;
-    padding: 14px;
-    border-radius: 14px;
-    border: 1px solid rgba(124, 58, 237, 0.2);
-    background: rgba(124, 58, 237, 0.08);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.04);
     color: var(--text-color);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
   }
 
   .result-close-btn:hover {
-    border-color: rgba(124, 58, 237, 0.3);
-    background: rgba(124, 58, 237, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
   }
 
   .result-close-btn:active {
     transform: scale(0.96);
   }
 
+  .scan-close-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background: var(--accent);
+    color: var(--bg-color);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: 900;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 65;
+    transition: all 0.2s;
+  }
+
+  .scan-sheet.active ~ .scan-close-btn,
+  .scan-sheet.active ~ #scanCloseBtn {
+    display: flex;
+  }
+
   .disclaimer {
-    margin-top: 24px;
+    margin-top: 20px;
     font-size: 11px;
-    color: var(--tg-theme-hint-color, var(--hint-color));
-    line-height: 1.6;
+    color: var(--text-dim);
+    line-height: 1.7;
     text-align: center;
-    padding: 0 8px;
-    opacity: 0.8;
+    padding: 0 8px 16px;
+    font-weight: 700;
+  }
+
+  .disclaimer strong {
+    font-weight: 900;
+    color: var(--text-color);
+  }
+
+  @media (max-width: 480px) {
+    .header h1 { font-size: 28px; }
+    .result-pair { font-size: 28px; }
+    .scan-sheet h2 { font-size: 22px; }
   }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>📊 Forex TG</h1>
+  <div class="live-badge">● LIVE</div>
+  <h1>Forex TG</h1>
   <p>Анализ сигналов в реальном времени</p>
 </div>
 
@@ -707,41 +747,46 @@
   <div class="ticker-track" id="tickerTrack"></div>
 </div>
 
-<div class="tabs">
-  <div class="tab active" data-category="forex">💱 Форекс</div>
-  <div class="tab" data-category="crypto">₿ Крипта</div>
-  <div class="tab" data-category="stocks">📈 Акции</div>
-  <div class="tab" data-category="otc">🕐 OTC</div>
+<div class="container">
+  <div class="tabs">
+    <div class="tab active" data-category="forex">💱 Форекс</div>
+    <div class="tab" data-category="crypto">₿ Крипта</div>
+    <div class="tab" data-category="stocks">📈 Акции</div>
+    <div class="tab" data-category="otc">🕐 OTC</div>
+  </div>
+
+  <div class="section-label">Выбери актив</div>
+  <input type="text" class="search-box" id="customSymbol" placeholder="Или впиши тикер: USD/SEK" />
+  <div class="asset-grid" id="assetGrid"></div>
+
+  <div class="section-label">Таймфрейм</div>
+  <div class="tf-grid" id="tfGrid">
+    <div class="tf-card" data-tf="1min">1м</div>
+    <div class="tf-card selected" data-tf="5min">5м</div>
+    <div class="tf-card" data-tf="15min">15м</div>
+    <div class="tf-card" data-tf="30min">30м</div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn">ПОЛУЧИТЬ СИГНАЛ</button>
+  <button class="scan-btn" id="scanBtn">🔎 УМНЫЙ СКАН</button>
+
+  <p class="disclaimer">
+    <strong>⚠️ ВАЖНО:</strong> Сигналы основаны на техническом анализе и не гарантируют результат. <strong>Торгуй на свой риск.</strong>
+  </p>
 </div>
-
-<div class="section-label">Выбери актив</div>
-<input type="text" class="search-box" id="customSymbol" placeholder="Или впиши тикер вручную, например: USD/SEK" />
-<div class="asset-grid" id="assetGrid"></div>
-
-<div class="section-label">Таймфрейм</div>
-<div class="tf-grid" id="tfGrid">
-  <div class="tf-card" data-tf="1min">1м</div>
-  <div class="tf-card selected" data-tf="5min">5м</div>
-  <div class="tf-card" data-tf="15min">15м</div>
-  <div class="tf-card" data-tf="30min">30м</div>
-</div>
-
-<button class="submit-btn" id="submitBtn">🚀 Получить сигнал</button>
-<button class="scan-btn" id="scanBtn">🔎 Умный скан категории</button>
 
 <!-- Экран загрузки -->
 <div class="loading-screen" id="loadingScreen">
-  <div class="ring-loader"><div class="ring-core"></div></div>
+  <div class="ring-loader"></div>
   <div class="loading-title">Анализирую сигнал</div>
   <div class="loading-sub" id="loadingSub">EUR/USD · 5м</div>
 </div>
 
 <!-- Карточка результата -->
 <div class="result-sheet" id="resultSheet">
-  <div class="handle"></div>
   <div class="result-status" id="resultStatus">Сигнал готов</div>
   <div class="result-pair" id="resultPair">EUR/USD</div>
-  <div class="result-confidence" id="resultConfidence">Уверенность: 4/5 индикаторов</div>
+  <div class="result-confidence" id="resultConfidence">Уверенность: 4/5</div>
 
   <button class="result-action-btn buy" id="resultActionBtn">
     <span id="resultArrow">↑</span>
@@ -755,7 +800,7 @@
     </div>
     <div class="result-info-row">
       <span class="label">Таймфрейм</span>
-      <span class="value" id="resultTf">5 минут</span>
+      <span class="value" id="resultTf">5м</span>
     </div>
     <div class="result-info-row">
       <span class="label">Цена входа</span>
@@ -764,23 +809,16 @@
   </div>
 
   <div class="result-reason" id="resultReason"></div>
-
-  <button class="result-close-btn" id="resultCloseBtn">Закрыть</button>
+  <button class="result-close-btn" id="resultCloseBtn">ЗАКРЫТЬ</button>
 </div>
 
 <!-- Экран результатов скана -->
 <div class="scan-sheet" id="scanSheet">
-  <div class="handle"></div>
-  <h2>🔎 Умный скан</h2>
+  <h2>🔎 УМНЫЙ СКАН</h2>
   <div class="scan-sub" id="scanSub">Форекс · 5м</div>
   <div id="scanResultsList"></div>
-  <button class="result-close-btn" id="scanCloseBtn" style="margin-top: 14px;">Закрыть</button>
+  <button class="result-close-btn" id="scanCloseBtn" style="margin-top: 14px;">ЗАКРЫТЬ</button>
 </div>
-
-<p class="disclaimer">
-  ⚠️ Сигналы основаны на техническом анализе (EMA, MACD, ADX, RSI, Bollinger, Stochastic, CCI, Williams %R).
-  Не гарантируют результат. Торгуй на свой риск. Никакая стратегия не даёт 100% проходимость.
-</p>
 
 <script>
   const tg = window.Telegram.WebApp;
@@ -940,7 +978,7 @@
   });
 
   // ============================================================
-  // УМНЫЙ АНАЛИЗ — Улучшенная логика скана с фильтрацией
+  // АНАЛИЗ
   // ============================================================
 
   const TWELVE_DATA_API_KEY = "1f3aeced1bfb4c2e9ad204309d592761";
@@ -952,7 +990,7 @@
   const STOCH_K = 14, STOCH_D = 3, STOCH_OB = 80, STOCH_OS = 20;
   const CCI_PERIOD = 20, CCI_OB = 100, CCI_OS = -100;
   const WILLR_PERIOD = 14, WILLR_OB = -20, WILLR_OS = -80;
-  const MIN_VOTES = 4; // Повышен порог для более качественных сигналов
+  const MIN_VOTES = 4;
 
   function emaArr(values, period) {
     const k = 2 / (period + 1);
@@ -1058,7 +1096,7 @@
     const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(symbol)}&interval=${timeframe}&outputsize=60&apikey=${TWELVE_DATA_API_KEY}`;
     const resp = await fetch(url);
     const data = await resp.json();
-    if (!data.values) throw new Error(data.message || "Не удалось получить данные");
+    if (!data.values) throw new Error(data.message || "Ошибка");
     const values = data.values.slice().reverse();
     return {
       time: values.map(v => v.datetime),
@@ -1090,7 +1128,7 @@
     if (!strongTrend) {
       return {
         signal: null,
-        reason: `Слабый тренд (ADX=${adx[n].toFixed(1)}) — рынок в боковике, сигнал не даю.`,
+        reason: `⚠️ Слабый тренд (ADX=${adx[n].toFixed(1)})\nРынок в боковике, сигнал не даю.`,
         price: close[n],
         votes: 0,
       };
@@ -1126,15 +1164,15 @@
       reasonLines.push(`✅ Тренд восходящий (EMA${EMA_FAST} > EMA${EMA_SLOW})`);
       reasonLines.push(`✅ Тренд мощный (ADX=${adx[n].toFixed(1)})`);
       reasonLines.push(...details.map(d => `✅ ${d}`));
-      reasonLines.push(`📊 ${bbPos}`);
+      reasonLines.push(`\n📊 ${bbPos}`);
     } else if (trendDown && bearVotes >= MIN_VOTES) {
       signal = "PUT";
       reasonLines.push(`✅ Тренд нисходящий (EMA${EMA_FAST} < EMA${EMA_SLOW})`);
       reasonLines.push(`✅ Тренд мощный (ADX=${adx[n].toFixed(1)})`);
       reasonLines.push(...details.map(d => `✅ ${d}`));
-      reasonLines.push(`📊 ${bbPos}`);
+      reasonLines.push(`\n📊 ${bbPos}`);
     } else {
-      reasonLines.push(`❌ Недостаточно согласия индикаторов`);
+      reasonLines.push(`❌ Недостаточно согласия`);
       reasonLines.push(`За рост: ${bullVotes}/5, за падение: ${bearVotes}/5`);
       reasonLines.push(`Нужно минимум ${MIN_VOTES} голосов`);
     }
@@ -1157,7 +1195,7 @@
     const symbols = SCAN_ASSETS[currentCategory] || SCAN_ASSETS.forex;
 
     loadingScreen.classList.add("active");
-    document.querySelector(".loading-title").textContent = "🔎 Умный скан";
+    document.querySelector(".loading-title").textContent = "Умный скан";
 
     const results = [];
 
@@ -1168,13 +1206,10 @@
         const candles = await fetchCandles(symbols[i], selectedTimeframe);
         const result = runIndicatorAnalysis(candles);
         if (result.signal && result.votes >= MIN_VOTES) results.push({ symbol: symbols[i], ...result });
-      } catch (err) {
-        // пропускаем актив
-      }
+      } catch (err) {}
       await new Promise(r => setTimeout(r, 200));
     }
 
-    // Сортируем результаты по количеству голосов (по убыванию)
     results.sort((a, b) => b.votes - a.votes);
 
     document.querySelector(".loading-title").textContent = "Анализирую сигнал";
@@ -1188,18 +1223,17 @@
     const list = document.getElementById("scanResultsList");
 
     if (results.length === 0) {
-      list.innerHTML = `<div class="scan-empty">😴 Сейчас нет активов с чётким сигналом<br><br>Рынок находится в боковике или индикаторы не согласуются. Попробуй позже или выбери другой таймфрейм.</div>`;
+      list.innerHTML = `<div class="scan-empty">😴 Сейчас нет активов с чётким сигналом\n\nПопробуй позже или выбери другой таймфрейм</div>`;
     } else {
       list.innerHTML = results.map(r => {
         const isBuy = r.signal === "CALL";
-        const arrow = isBuy ? "📈" : "📉";
         return `
           <div class="scan-result-item">
             <div>
-              <div class="name">${arrow} ${r.symbol}</div>
-              <div class="meta">Индикаторов согласны: ${r.votes}/5 · Цена: ${r.price.toFixed(5)}</div>
+              <div class="name">${isBuy ? "📈" : "📉"} ${r.symbol}</div>
+              <div class="meta">${r.votes}/5 индикаторов · ${r.price.toFixed(5)}</div>
             </div>
-            <div class="badge ${isBuy ? "buy" : "sell"}">${isBuy ? "↑ BUY" : "↓ SELL"}</div>
+            <div class="badge ${isBuy ? "buy" : "sell"}">${isBuy ? "BUY" : "SELL"}</div>
           </div>
         `;
       }).join("");
@@ -1251,19 +1285,19 @@
     btn.classList.remove("buy", "sell", "neutral");
 
     if (result.signal === "CALL") {
-      status.textContent = "✅ Сигнал готов";
+      status.textContent = "✅ СИГНАЛ ГОТОВ";
       btn.classList.add("buy");
       arrow.textContent = "📈";
       actionText.textContent = "ПОКУПКА";
       confidence.textContent = `${result.votes}/5 индикаторов согласны`;
     } else if (result.signal === "PUT") {
-      status.textContent = "✅ Сигнал готов";
+      status.textContent = "✅ СИГНАЛ ГОТОВ";
       btn.classList.add("sell");
       arrow.textContent = "📉";
       actionText.textContent = "ПРОДАЖА";
       confidence.textContent = `${result.votes}/5 индикаторов согласны`;
     } else {
-      status.textContent = "⚠️ Сигнала нет";
+      status.textContent = "❌ НЕТУ СИГНАЛА";
       btn.classList.add("neutral");
       arrow.textContent = "–";
       actionText.textContent = "НЕТ СИГНАЛА";
