@@ -3,109 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Forex Signal Bot</title>
+<title>Forex TG</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
+  /* ============================================
+     🎨 ЗОНА НАСТРОЙКИ ЦВЕТОВ — меняй только тут
+     ============================================ */
   :root {
     color-scheme: light dark;
+
+    --accent-1: #4facfe;      /* основной цвет градиента (кнопки, акценты) */
+    --accent-2: #00f2fe;      /* второй цвет градиента */
+    --bg-color: #0f1117;      /* фон приложения */
+    --bg-glow-1: #1a2a6c;     /* цветное пятно на фоне (левый верх) */
+    --bg-glow-2: #2b0f54;     /* цветное пятно на фоне (правый низ) */
+    --card-bg: rgba(255,255,255,0.06);   /* фон карточек активов */
+    --text-color: #ffffff;
+    --hint-color: #8b8f9a;
   }
+  /* ============================================ */
+
+  * { box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--tg-theme-bg-color, #ffffff);
-    color: var(--tg-theme-text-color, #000000);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    color: var(--tg-theme-text-color, var(--text-color));
     margin: 0;
-    padding: 20px;
+    padding: 16px;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 100vh;
+    background-color: var(--tg-theme-bg-color, var(--bg-color));
+    background-image:
+      radial-gradient(circle at 15% 10%, var(--bg-glow-1) 0%, transparent 45%),
+      radial-gradient(circle at 85% 90%, var(--bg-glow-2) 0%, transparent 45%);
+    background-attachment: fixed;
   }
-  h2 {
-    font-size: 20px;
-    margin-bottom: 4px;
+
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
   }
-  p.hint {
-    color: var(--tg-theme-hint-color, #888);
-    font-size: 14px;
-    margin-top: 0;
-    margin-bottom: 24px;
+  .header h1 {
+    font-size: 22px;
+    margin: 0 0 4px 0;
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
   }
-  label {
-    display: block;
+  .header p {
+    color: var(--tg-theme-hint-color, var(--hint-color));
+    font-size: 13px;
+    margin: 0;
+  }
+
+  /* Вкладки категорий активов */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: rgba(255,255,255,0.05);
+    padding: 4px;
+    border-radius: 14px;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px 4px;
+    border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
-    margin-bottom: 8px;
-    margin-top: 20px;
+    color: var(--tg-theme-hint-color, var(--hint-color));
+    cursor: pointer;
+    transition: all 0.2s;
   }
-  select {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 10px;
-    border: 1px solid var(--tg-theme-hint-color, #ccc);
-    background: var(--tg-theme-secondary-bg-color, #f5f5f5);
-    color: var(--tg-theme-text-color, #000);
+  .tab.active {
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    color: var(--bg-color);
   }
-  .pair-grid {
+
+  .section-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--tg-theme-hint-color, var(--hint-color));
+    margin: 16px 0 8px 2px;
+    font-weight: 700;
+  }
+
+  .asset-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin-top: 8px;
   }
-  .pair-btn {
-    padding: 14px 8px;
+  .asset-card {
+    padding: 14px 10px;
+    border-radius: 14px;
+    background: var(--card-bg);
+    border: 1.5px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .asset-card .icon {
+    font-size: 20px;
+  }
+  .asset-card .name {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .asset-card.selected {
+    border-color: var(--accent-1);
+    background: linear-gradient(135deg, rgba(79,172,254,0.18), rgba(0,242,254,0.10));
+  }
+
+  .tf-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .tf-card {
     text-align: center;
-    border-radius: 10px;
-    border: 2px solid var(--tg-theme-hint-color, #ddd);
-    background: var(--tg-theme-secondary-bg-color, #f5f5f5);
-    font-size: 15px;
-    font-weight: 500;
+    padding: 12px 4px;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1.5px solid transparent;
+    font-size: 14px;
+    font-weight: 700;
     cursor: pointer;
   }
-  .pair-btn.selected {
-    border-color: var(--tg-theme-button-color, #2481cc);
-    background: var(--tg-theme-button-color, #2481cc);
-    color: var(--tg-theme-button-text-color, #fff);
+  .tf-card.selected {
+    border-color: var(--accent-1);
+    background: linear-gradient(135deg, rgba(79,172,254,0.18), rgba(0,242,254,0.10));
   }
+
   .submit-btn {
-    margin-top: 32px;
+    margin-top: 24px;
     width: 100%;
     padding: 16px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 800;
     border: none;
-    border-radius: 12px;
-    background: var(--tg-theme-button-color, #2481cc);
-    color: var(--tg-theme-button-text-color, #fff);
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    color: var(--bg-color);
+    box-shadow: 0 6px 20px rgba(79,172,254,0.35);
   }
+  .submit-btn:active {
+    transform: scale(0.98);
+  }
+
   .disclaimer {
-    margin-top: 24px;
-    font-size: 12px;
-    color: var(--tg-theme-hint-color, #888);
+    margin-top: 18px;
+    font-size: 11.5px;
+    color: var(--tg-theme-hint-color, var(--hint-color));
     line-height: 1.5;
+    text-align: center;
+    padding: 0 8px;
   }
 </style>
 </head>
 <body>
 
-<h2>Настройка сигналов</h2>
-<p class="hint">Выбери валютную пару и таймфрейм для анализа</p>
-
-<label>Валютная пара</label>
-<div class="pair-grid" id="pairGrid">
-  <div class="pair-btn" data-pair="EUR/USD">EUR/USD</div>
-  <div class="pair-btn" data-pair="GBP/USD">GBP/USD</div>
-  <div class="pair-btn" data-pair="USD/JPY">USD/JPY</div>
-  <div class="pair-btn" data-pair="AUD/USD">AUD/USD</div>
-  <div class="pair-btn" data-pair="USD/CAD">USD/CAD</div>
-  <div class="pair-btn" data-pair="USD/CHF">USD/CHF</div>
-  <div class="pair-btn" data-pair="NZD/USD">NZD/USD</div>
-  <div class="pair-btn" data-pair="EUR/GBP">EUR/GBP</div>
+<div class="header">
+  <h1>📊 Forex TG</h1>
+  <p>Выбери актив и таймфрейм для анализа</p>
 </div>
 
-<label>Таймфрейм</label>
-<select id="timeframe">
-  <option value="1min">1 минута</option>
-  <option value="5min" selected>5 минут</option>
-  <option value="15min">15 минут</option>
-  <option value="30min">30 минут</option>
-</select>
+<div class="tabs">
+  <div class="tab active" data-category="forex">💱 Форекс</div>
+  <div class="tab" data-category="crypto">₿ Крипта</div>
+  <div class="tab" data-category="stocks">📈 Акции</div>
+</div>
+
+<div class="section-label">Актив</div>
+<div class="asset-grid" id="assetGrid"></div>
+
+<div class="section-label">Таймфрейм</div>
+<div class="tf-grid" id="tfGrid">
+  <div class="tf-card" data-tf="1min">1м</div>
+  <div class="tf-card selected" data-tf="5min">5м</div>
+  <div class="tf-card" data-tf="15min">15м</div>
+  <div class="tf-card" data-tf="30min">30м</div>
+</div>
 
 <button class="submit-btn" id="submitBtn">Получить сигнал</button>
 
@@ -119,23 +200,89 @@
   const tg = window.Telegram.WebApp;
   tg.expand();
 
-  let selectedPair = "EUR/USD";
-  document.querySelectorAll(".pair-btn")[0].classList.add("selected");
+  const ASSETS = {
+    forex: [
+      { icon: "🇪🇺🇺🇸", name: "EUR/USD", symbol: "EUR/USD" },
+      { icon: "🇬🇧🇺🇸", name: "GBP/USD", symbol: "GBP/USD" },
+      { icon: "🇺🇸🇯🇵", name: "USD/JPY", symbol: "USD/JPY" },
+      { icon: "🇦🇺🇺🇸", name: "AUD/USD", symbol: "AUD/USD" },
+      { icon: "🇺🇸🇨🇦", name: "USD/CAD", symbol: "USD/CAD" },
+      { icon: "🇺🇸🇨🇭", name: "USD/CHF", symbol: "USD/CHF" },
+      { icon: "🇳🇿🇺🇸", name: "NZD/USD", symbol: "NZD/USD" },
+      { icon: "🇪🇺🇬🇧", name: "EUR/GBP", symbol: "EUR/GBP" },
+      { icon: "🇪🇺🇯🇵", name: "EUR/JPY", symbol: "EUR/JPY" },
+      { icon: "🇬🇧🇯🇵", name: "GBP/JPY", symbol: "GBP/JPY" },
+    ],
+    crypto: [
+      { icon: "₿", name: "BTC/USD", symbol: "BTC/USD" },
+      { icon: "Ξ", name: "ETH/USD", symbol: "ETH/USD" },
+      { icon: "◎", name: "SOL/USD", symbol: "SOL/USD" },
+      { icon: "✕", name: "XRP/USD", symbol: "XRP/USD" },
+      { icon: "🐕", name: "DOGE/USD", symbol: "DOGE/USD" },
+      { icon: "🔷", name: "BNB/USD", symbol: "BNB/USD" },
+      { icon: "🅰", name: "ADA/USD", symbol: "ADA/USD" },
+      { icon: "🔺", name: "AVAX/USD", symbol: "AVAX/USD" },
+    ],
+    stocks: [
+      { icon: "🍎", name: "Apple", symbol: "AAPL" },
+      { icon: "🪟", name: "Microsoft", symbol: "MSFT" },
+      { icon: "🔍", name: "Google", symbol: "GOOGL" },
+      { icon: "📦", name: "Amazon", symbol: "AMZN" },
+      { icon: "🚗", name: "Tesla", symbol: "TSLA" },
+      { icon: "💻", name: "Nvidia", symbol: "NVDA" },
+      { icon: "📘", name: "Meta", symbol: "META" },
+      { icon: "🎬", name: "Netflix", symbol: "NFLX" },
+    ],
+  };
 
-  document.querySelectorAll(".pair-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".pair-btn").forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      selectedPair = btn.dataset.pair;
+  let currentCategory = "forex";
+  let selectedSymbol = ASSETS.forex[0].symbol;
+  let selectedTimeframe = "5min";
+
+  function renderAssets() {
+    const grid = document.getElementById("assetGrid");
+    grid.innerHTML = "";
+    ASSETS[currentCategory].forEach((asset, i) => {
+      const card = document.createElement("div");
+      card.className = "asset-card" + (asset.symbol === selectedSymbol ? " selected" : "");
+      card.innerHTML = `<span class="icon">${asset.icon}</span><span class="name">${asset.name}</span>`;
+      card.addEventListener("click", () => {
+        selectedSymbol = asset.symbol;
+        renderAssets();
+      });
+      grid.appendChild(card);
+    });
+  }
+
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      currentCategory = tab.dataset.category;
+      selectedSymbol = ASSETS[currentCategory][0].symbol;
+      renderAssets();
+    });
+  });
+
+  document.querySelectorAll(".tf-card").forEach(card => {
+    card.addEventListener("click", () => {
+      document.querySelectorAll(".tf-card").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      selectedTimeframe = card.dataset.tf;
     });
   });
 
   document.getElementById("submitBtn").addEventListener("click", () => {
-    const timeframe = document.getElementById("timeframe").value;
-    const data = JSON.stringify({ pair: selectedPair, timeframe: timeframe });
+    const data = JSON.stringify({
+      pair: selectedSymbol,
+      timeframe: selectedTimeframe,
+      category: currentCategory
+    });
     tg.sendData(data);
     tg.close();
   });
+
+  renderAssets();
 </script>
 
 </body>
