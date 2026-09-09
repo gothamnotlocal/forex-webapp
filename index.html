@@ -40,7 +40,7 @@
       linear-gradient(135deg, #000000, #1a1a1a, #050505, #232323, #000000);
     background-size: 200% 200%, 200% 200%, 200% 200%, 200% 200%, 400% 400%;
     background-attachment: fixed;
-    animation: bg-shimmer 18s ease-in-out infinite;
+    animation: bg-shimmer 26s ease-in-out infinite;
     position: relative;
   }
   @keyframes bg-shimmer {
@@ -75,7 +75,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800;
-    animation: title-shimmer 4s linear infinite;
+    animation: title-shimmer 7s ease-in-out infinite;
   }
   @keyframes title-shimmer {
     from { background-position: 0% center; }
@@ -157,7 +157,21 @@
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: border-color 0.25s ease, background 0.35s ease, transform 0.2s cubic-bezier(.34,1.56,.64,1);
+    animation: card-appear 0.4s cubic-bezier(.2,.9,.3,1) backwards;
+  }
+  @keyframes card-appear {
+    from { opacity: 0; transform: translateY(8px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .asset-card.pop {
+    animation: card-pop 0.4s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes card-pop {
+    0% { transform: scale(1); }
+    35% { transform: scale(0.92); }
+    65% { transform: scale(1.05); }
+    100% { transform: scale(1); }
   }
   .asset-card .icon {
     font-size: 20px;
@@ -185,6 +199,10 @@
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
+    transition: border-color 0.25s ease, background 0.35s ease, transform 0.2s cubic-bezier(.34,1.56,.64,1);
+  }
+  .tf-card.pop {
+    animation: card-pop 0.4s cubic-bezier(.34,1.56,.64,1);
   }
   .tf-card.selected {
     border-color: var(--accent-1);
@@ -230,11 +248,17 @@
     align-items: center;
     overflow: hidden;
     white-space: nowrap;
-    background: rgba(255,255,255,0.04);
     border-radius: 10px;
     padding: 8px 0;
     margin-bottom: 16px;
     border: 1px solid rgba(255,255,255,0.06);
+    background-color: rgba(255,255,255,0.03);
+    background-image:
+      radial-gradient(circle at 15% 50%, #ffffff14 0%, transparent 55%),
+      radial-gradient(circle at 85% 50%, #ffffff0c 0%, transparent 55%),
+      linear-gradient(120deg, #000000, #1c1c1c, #050505, #232323, #000000);
+    background-size: 200% 200%, 200% 200%, 400% 400%;
+    animation: bg-shimmer 20s ease-in-out infinite;
   }
   .live-badge {
     flex-shrink: 0;
@@ -251,12 +275,12 @@
   .live-badge .live-dot {
     width: 7px; height: 7px; border-radius: 50%;
     background: #ffffff;
-    box-shadow: 0 0 6px #ffffff, 0 0 12px #ffffff;
-    animation: live-pulse 1.3s ease-in-out infinite;
+    box-shadow: 0 0 6px #ffffff, 0 0 10px #ffffff;
+    animation: live-pulse 1.8s ease-in-out infinite;
   }
   @keyframes live-pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.35; transform: scale(0.75); }
+    50% { opacity: 0.5; transform: scale(0.85); }
   }
   .ticker-scroll-area {
     overflow: hidden;
@@ -265,7 +289,7 @@
   }
   .ticker-track {
     display: inline-block;
-    animation: ticker-scroll 55s linear infinite;
+    animation: ticker-scroll 90s linear infinite;
   }
   .ticker-item {
     display: inline-flex;
@@ -379,7 +403,7 @@
       radial-gradient(circle at 50% 50%, #ffffff10 0%, transparent 55%),
       linear-gradient(135deg, #000000, #1c1c1c, #050505);
     background-size: 200% 200%, 300% 300%;
-    animation: bg-shimmer 12s ease-in-out infinite;
+    animation: bg-shimmer 22s ease-in-out infinite;
     z-index: 50;
   }
   .loading-screen.active { display: flex; }
@@ -395,7 +419,7 @@
     inset: -20px;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 65%);
-    animation: halo-breathe 2.4s ease-in-out infinite;
+    animation: halo-breathe 3.2s ease-in-out infinite;
   }
   @keyframes halo-breathe {
     0%, 100% { opacity: 0.5; transform: scale(0.92); }
@@ -413,14 +437,14 @@
     border-top-color: #ffffff;
     border-right-color: #ffffff;
     filter: drop-shadow(0 0 10px #ffffff);
-    animation: ring-spin 1.3s cubic-bezier(.5,.1,.5,.9) infinite;
+    animation: ring-spin 2.1s cubic-bezier(.45,.05,.55,.95) infinite;
   }
   .ring-loader::after {
     inset: 16px;
     border-bottom-color: #c9c9c9;
     border-left-color: #c9c9c9;
     filter: drop-shadow(0 0 7px #c9c9c9);
-    animation: ring-spin-rev 1.9s cubic-bezier(.5,.1,.5,.9) infinite;
+    animation: ring-spin-rev 2.8s cubic-bezier(.45,.05,.55,.95) infinite;
   }
   @keyframes ring-spin {
     from { transform: rotate(0deg); }
@@ -434,7 +458,7 @@
     position: absolute;
     inset: -8px;
     border-radius: 50%;
-    animation: ring-spin 3.5s linear infinite;
+    animation: ring-spin 5.5s linear infinite;
   }
   .ring-orbit .satellite {
     position: absolute;
@@ -450,7 +474,7 @@
     inset: 40px;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 70%);
-    animation: ring-pulse 1.6s ease-in-out infinite;
+    animation: ring-pulse 2.3s ease-in-out infinite;
   }
   @keyframes ring-pulse {
     0%, 100% { opacity: 0.35; transform: scale(0.88); }
@@ -488,6 +512,25 @@
     background: rgba(255,255,255,0.2);
     margin: 0 auto 18px;
   }
+
+  @keyframes sheet-item-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .result-sheet.active .result-status { animation: sheet-item-in 0.4s cubic-bezier(.2,.9,.3,1) 0.05s backwards; }
+  .result-sheet.active .result-pair { animation: sheet-item-in 0.4s cubic-bezier(.2,.9,.3,1) 0.1s backwards; }
+  .result-sheet.active .result-confidence { animation: sheet-item-in 0.4s cubic-bezier(.2,.9,.3,1) 0.15s backwards; }
+  .result-sheet.active .result-action-btn { animation: sheet-btn-in 0.5s cubic-bezier(.34,1.56,.64,1) 0.2s backwards; }
+  .result-sheet.active .result-info { animation: sheet-item-in 0.4s cubic-bezier(.2,.9,.3,1) 0.3s backwards; }
+  .result-sheet.active .result-reason { animation: sheet-item-in 0.4s cubic-bezier(.2,.9,.3,1) 0.38s backwards; }
+  .result-sheet.active .result-close-btn { animation: sheet-item-in 0.4s cubic-bezier(.2,.9,.3,1) 0.45s backwards; }
+
+  @keyframes sheet-btn-in {
+    0% { opacity: 0; transform: scale(0.85); }
+    60% { opacity: 1; transform: scale(1.03); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
   .result-status {
     text-align: center;
     font-size: 12.5px;
@@ -523,19 +566,32 @@
     gap: 6px;
     color: #ffffff;
     margin-bottom: 18px;
+    position: relative;
+    overflow: visible;
   }
   .result-action-btn.buy {
     background: linear-gradient(135deg, #0fbf6f, #0a8f52);
     box-shadow: 0 8px 24px rgba(15,191,111,0.35);
+    animation: sheet-btn-in 0.5s cubic-bezier(.34,1.56,.64,1) 0.2s backwards, glow-pulse-green 2.2s ease-in-out 0.7s infinite;
   }
   .result-action-btn.sell {
     background: linear-gradient(135deg, #ff5f6d, #c81e3a);
     box-shadow: 0 8px 24px rgba(255,95,109,0.35);
+    animation: sheet-btn-in 0.5s cubic-bezier(.34,1.56,.64,1) 0.2s backwards, glow-pulse-red 2.2s ease-in-out 0.7s infinite;
+  }
+  @keyframes glow-pulse-green {
+    0%, 100% { box-shadow: 0 8px 24px rgba(15,191,111,0.35); }
+    50% { box-shadow: 0 8px 34px rgba(15,191,111,0.6); }
+  }
+  @keyframes glow-pulse-red {
+    0%, 100% { box-shadow: 0 8px 24px rgba(255,95,109,0.35); }
+    50% { box-shadow: 0 8px 34px rgba(255,95,109,0.6); }
   }
   .result-action-btn.neutral {
     background: rgba(255,255,255,0.08);
     color: var(--hint-color);
     box-shadow: none;
+    animation: sheet-btn-in 0.5s cubic-bezier(.34,1.56,.64,1) 0.2s backwards;
   }
   .result-info {
     background: rgba(255,255,255,0.05);
@@ -775,11 +831,19 @@
     ASSETS[currentCategory].forEach((asset, i) => {
       const card = document.createElement("div");
       card.className = "asset-card" + (asset.symbol === selectedSymbol ? " selected" : "");
+      card.style.animationDelay = `${i * 0.03}s`;
       card.innerHTML = `<span class="icon">${asset.icon}</span><span class="name">${asset.name}</span>`;
       card.addEventListener("click", () => {
         selectedSymbol = asset.symbol;
         document.getElementById("customSymbol").value = "";
         renderAssets();
+        requestAnimationFrame(() => {
+          const newlySelected = document.querySelector(".asset-card.selected");
+          if (newlySelected) {
+            newlySelected.classList.add("pop");
+            setTimeout(() => newlySelected.classList.remove("pop"), 400);
+          }
+        });
       });
       grid.appendChild(card);
     });
@@ -808,7 +872,8 @@
   document.querySelectorAll(".tf-card").forEach(card => {
     card.addEventListener("click", () => {
       document.querySelectorAll(".tf-card").forEach(c => c.classList.remove("selected"));
-      card.classList.add("selected");
+      card.classList.add("selected", "pop");
+      setTimeout(() => card.classList.remove("pop"), 400);
       selectedTimeframe = card.dataset.tf;
     });
   });
