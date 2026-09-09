@@ -12,14 +12,22 @@
   :root {
     color-scheme: light dark;
 
-    --accent-1: #f5f5f5;      /* основной цвет градиента (кнопки, акценты) */
-    --accent-2: #9e9e9e;      /* второй цвет градиента */
+    /* base gradient colors (animated) */
+    --g1: #6ee7b7;
+    --g2: #8dd3ff;
+    --g3: #c7a7ff;
+
+    --accent-1: linear-gradient(90deg, var(--g1), var(--g2));
+    --accent-2: linear-gradient(90deg, var(--g2), var(--g3));
+
     --bg-color: #060606;      /* фон приложения */
-    --bg-glow-1: #2b2b2b;     /* цветное пятно на фоне (левый верх) */
-    --bg-glow-2: #1a1a1a;     /* цветное пятно на фоне (правый низ) */
-    --card-bg: rgba(255,255,255,0.06);   /* фон карточек активов */
+    --bg-glow-1: #1b1f24;     /* цветное пятно на фоне (левый верх) */
+    --bg-glow-2: #0f1113;     /* цветное пятно на фоне (правый низ) */
+    --card-bg: rgba(255,255,255,0.04);   /* фон карточек активов */
     --text-color: #ffffff;
-    --hint-color: #8b8b8b;
+    --hint-color: #9aa3b2;
+
+    --gradient-speed: 8s;
   }
   /* ============================================ */
 
@@ -33,9 +41,21 @@
     min-height: 100vh;
     background-color: var(--tg-theme-bg-color, var(--bg-color));
     background-image:
-      radial-gradient(circle at 15% 10%, var(--bg-glow-1) 0%, transparent 45%),
-      radial-gradient(circle at 85% 90%, var(--bg-glow-2) 0%, transparent 45%);
+      radial-gradient(circle at 12% 12%, var(--bg-glow-1) 0%, transparent 45%),
+      radial-gradient(circle at 88% 88%, var(--bg-glow-2) 0%, transparent 45%);
     background-attachment: fixed;
+  }
+
+  /* Animated gradient helper */
+  .animated-gradient {
+    background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3));
+    background-size: 300% 300%;
+    animation: gradientShift var(--gradient-speed) linear infinite;
+  }
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
   .header {
@@ -45,9 +65,11 @@
   .header h1 {
     font-size: 22px;
     margin: 0 0 4px 0;
-    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3));
+    background-size: 300% 300%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    animation: gradientShift var(--gradient-speed) linear infinite;
     font-weight: 800;
   }
   .header p {
@@ -61,7 +83,7 @@
     display: flex;
     gap: 8px;
     margin-bottom: 16px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.03);
     padding: 4px;
     border-radius: 14px;
   }
@@ -77,8 +99,22 @@
     transition: all 0.2s;
   }
   .tab.active {
-    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
     color: var(--bg-color);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    position: relative;
+  }
+  .tab.active::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    padding: 1px;
+    background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3));
+    -webkit-mask: linear-gradient(#000 0 0);
+    filter: blur(0.4px);
+    z-index: -1;
+    background-size: 300% 300%;
+    animation: gradientShift var(--gradient-speed) linear infinite;
   }
 
   .section-label {
@@ -99,7 +135,7 @@
     padding: 14px 10px;
     border-radius: 14px;
     background: var(--card-bg);
-    border: 1.5px solid transparent;
+    border: 1.2px solid transparent;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -114,8 +150,9 @@
     font-weight: 600;
   }
   .asset-card.selected {
-    border-color: var(--accent-1);
-    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(200,200,200,0.08));
+    border-image: linear-gradient(90deg, var(--g1), var(--g2)) 1;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
   }
 
   .tf-grid {
@@ -128,58 +165,74 @@
     padding: 12px 4px;
     border-radius: 12px;
     background: var(--card-bg);
-    border: 1.5px solid transparent;
+    border: 1.2px solid transparent;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
   }
+  .tf-card:hover { transform: translateY(-3px); }
   .tf-card.selected {
-    border-color: var(--accent-1);
-    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(200,200,200,0.08));
+    border-image: linear-gradient(90deg, var(--g2), var(--g3)) 1;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
   }
 
   .submit-btn {
-    margin-top: 24px;
+    margin-top: 16px;
     width: 100%;
-    padding: 16px;
+    padding: 14px;
     font-size: 16px;
     font-weight: 800;
     border: none;
     border-radius: 16px;
-    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
     color: var(--bg-color);
-    box-shadow: 0 6px 20px rgba(255,255,255,0.20);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    cursor: pointer;
+    background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3));
+    background-size: 300% 300%;
+    animation: gradientShift var(--gradient-speed) linear infinite;
   }
-  .submit-btn:active {
-    transform: scale(0.98);
-  }
+  .submit-btn:active { transform: scale(0.99); }
 
-.search-box {
+  .scan-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: transparent;
+    color: var(--text-color);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .scan-btn:active { transform: scale(0.99); }
+
+  .search-box {
     width: 100%;
     padding: 12px 14px;
     border-radius: 12px;
     background: var(--card-bg);
-    border: 1.5px solid rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.06);
     color: var(--text-color);
     font-size: 14px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
-  .search-box::placeholder {
-    color: var(--hint-color);
-  }
-  .search-box:focus {
-    outline: none;
-    border-color: var(--accent-1);
-  }
+  .search-box::placeholder { color: var(--hint-color); }
+  .search-box:focus { outline: none; border-color: rgba(255,255,255,0.12); }
 
   .ticker-wrap {
     overflow: hidden;
     white-space: nowrap;
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.02);
     border-radius: 10px;
     padding: 8px 0;
     margin-bottom: 16px;
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.04);
   }
   .ticker-track {
     display: inline-block;
@@ -196,32 +249,14 @@
   }
   .ticker-item .dot {
     width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent-1);
+    background: linear-gradient(90deg, var(--g1), var(--g2));
   }
   @keyframes ticker-scroll {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
   }
 
-  .scan-btn {
-    width: 100%;
-    padding: 14px;
-    margin-top: 10px;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: var(--bg-color);
-    color: var(--text-color);
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .scan-btn:active { transform: scale(0.98); }
-
-  /* ===== Экран результатов скана ===== */
+  /* Scan sheet */
   .scan-sheet {
     position: fixed;
     left: 0; right: 0; bottom: 0;
@@ -234,13 +269,13 @@
     transform: translateY(100%);
     transition: transform 0.35s cubic-bezier(.2,.9,.3,1);
     z-index: 60;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.06);
     overflow-y: auto;
   }
   .scan-sheet.active { transform: translateY(0); }
   .scan-sheet .handle {
     width: 40px; height: 4px; border-radius: 2px;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.12);
     margin: 0 auto 16px;
   }
   .scan-sheet h2 {
@@ -255,28 +290,39 @@
     color: var(--hint-color);
     margin-bottom: 18px;
   }
+  #scanResultsList { display: grid; gap: 10px; }
+
   .scan-result-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
-    border-radius: 14px;
-    background: rgba(255,255,255,0.05);
-    margin-bottom: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.03);
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
   }
-  .scan-result-item .name {
-    font-size: 15px;
-    font-weight: 700;
-  }
-  .scan-result-item .badge {
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 800;
+  .scan-result-item:hover { transform: translateY(-4px); box-shadow: 0 14px 40px rgba(0,0,0,0.6); }
+  .scan-result-item .left { display:flex; flex-direction:column; gap:4px; }
+  .scan-result-item .name { font-size:15px; font-weight:800; color:var(--text-color); }
+  .scan-result-item .meta { font-size:12px; color:var(--hint-color); }
+  .scan-result-badge {
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-weight: 900;
     color: #fff;
+    min-width: 80px;
+    text-align: center;
+    background: linear-gradient(90deg, rgba(15,191,111,0.95), rgba(10,143,82,0.95));
+    background-size: 300% 300%;
+    animation: gradientShift 6s linear infinite;
   }
-  .scan-result-item .badge.buy { background: linear-gradient(135deg, #0fbf6f, #0a8f52); }
-  .scan-result-item .badge.sell { background: linear-gradient(135deg, #ff5f6d, #c81e3a); }
+  .scan-result-badge.sell {
+    background: linear-gradient(90deg, rgba(255,95,109,0.95), rgba(200,30,58,0.95));
+    animation: gradientShift 6s linear infinite;
+  }
+
   .scan-empty {
     text-align: center;
     color: var(--hint-color);
@@ -284,7 +330,7 @@
     padding: 30px 10px;
   }
 
-  /* ===== Экран загрузки — светящееся кольцо ===== */
+  /* loading screen */
   .loading-screen {
     position: fixed;
     inset: 0;
@@ -292,16 +338,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: var(--bg-color);
+    background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.7));
     z-index: 50;
+    gap: 16px;
   }
   .loading-screen.active { display: flex; }
 
   .ring-loader {
-    width: 160px;
-    height: 160px;
+    width: 120px;
+    height: 120px;
     position: relative;
-    margin-bottom: 28px;
+    margin-bottom: 8px;
   }
   .ring-loader::before,
   .ring-loader::after {
@@ -312,50 +359,28 @@
     border: 3px solid transparent;
   }
   .ring-loader::before {
-    border-top-color: var(--accent-1);
-    border-right-color: var(--accent-1);
-    filter: drop-shadow(0 0 8px var(--accent-1));
-    animation: ring-spin 1.1s linear infinite;
+    border-top-color: var(--g1);
+    border-right-color: var(--g2);
+    filter: drop-shadow(0 0 8px rgba(0,0,0,0.6));
+    animation: ring-spin 1.2s linear infinite;
   }
   .ring-loader::after {
-    inset: 14px;
-    border-bottom-color: var(--accent-2);
-    border-left-color: var(--accent-2);
-    filter: drop-shadow(0 0 6px var(--accent-2));
-    animation: ring-spin-rev 1.6s linear infinite;
+    inset: 12px;
+    border-bottom-color: var(--g3);
+    border-left-color: var(--g2);
+    filter: drop-shadow(0 0 6px rgba(0,0,0,0.5));
+    animation: ring-spin-rev 1.8s linear infinite;
   }
-  @keyframes ring-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  @keyframes ring-spin-rev {
-    from { transform: rotate(360deg); }
-    to { transform: rotate(0deg); }
-  }
-  .ring-core {
-    position: absolute;
-    inset: 34px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.10), transparent 70%);
-    animation: ring-pulse 1.4s ease-in-out infinite;
-  }
-  @keyframes ring-pulse {
-    0%, 100% { opacity: 0.4; transform: scale(0.9); }
-    50% { opacity: 1; transform: scale(1.05); }
-  }
-  .loading-title {
-    font-size: 17px;
-    font-weight: 800;
-    margin-bottom: 6px;
-  }
-  .loading-sub {
-    font-size: 13px;
-    color: var(--hint-color);
-    text-align: center;
-    min-height: 18px;
-  }
+  @keyframes ring-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes ring-spin-rev { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
 
-  /* ===== Карточка результата ===== */
+  .loading-title { font-size: 17px; font-weight: 800; color:var(--text-color); }
+  .loading-sub { font-size: 13px; color:var(--hint-color); min-height:18px; }
+
+  .loading-progress { width: 80%; height: 8px; background: rgba(255,255,255,0.04); border-radius: 8px; overflow: hidden; }
+  .loading-progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--g1), var(--g2)); transition: width .24s linear; }
+
+  /* result sheet (unchanged mostly) */
   .result-sheet {
     position: fixed;
     left: 0; right: 0; bottom: 0;
@@ -367,692 +392,7 @@
     transform: translateY(100%);
     transition: transform 0.35s cubic-bezier(.2,.9,.3,1);
     z-index: 60;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.06);
   }
   .result-sheet.active { transform: translateY(0); }
-  .result-sheet .handle {
-    width: 40px; height: 4px; border-radius: 2px;
-    background: rgba(255,255,255,0.2);
-    margin: 0 auto 18px;
-  }
-  .result-status {
-    text-align: center;
-    font-size: 12.5px;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--accent-1);
-    margin-bottom: 10px;
-  }
-  .result-pair {
-    text-align: center;
-    font-size: 26px;
-    font-weight: 800;
-    margin-bottom: 4px;
-  }
-  .result-confidence {
-    text-align: center;
-    font-size: 13px;
-    color: var(--hint-color);
-    margin-bottom: 20px;
-  }
-  .result-action-btn {
-    width: 100%;
-    padding: 22px;
-    border-radius: 18px;
-    border: none;
-    font-size: 22px;
-    font-weight: 900;
-    letter-spacing: 0.03em;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    color: #ffffff;
-    margin-bottom: 18px;
-  }
-  .result-action-btn.buy {
-    background: linear-gradient(135deg, #0fbf6f, #0a8f52);
-    box-shadow: 0 8px 24px rgba(15,191,111,0.35);
-  }
-  .result-action-btn.sell {
-    background: linear-gradient(135deg, #ff5f6d, #c81e3a);
-    box-shadow: 0 8px 24px rgba(255,95,109,0.35);
-  }
-  .result-action-btn.neutral {
-    background: rgba(255,255,255,0.08);
-    color: var(--hint-color);
-    box-shadow: none;
-  }
-  .result-info {
-    background: rgba(255,255,255,0.05);
-    border-radius: 14px;
-    padding: 4px 16px;
-    margin-bottom: 16px;
-  }
-  .result-info-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    font-size: 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
-  .result-info-row:last-child { border-bottom: none; }
-  .result-info-row .label { color: var(--hint-color); }
-  .result-info-row .value { font-weight: 700; }
-  .result-reason {
-    font-size: 12px;
-    color: var(--hint-color);
-    line-height: 1.6;
-    margin-bottom: 18px;
-    white-space: pre-line;
-  }
-  .result-close-btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 14px;
-    border: none;
-    background: rgba(255,255,255,0.08);
-    color: var(--text-color);
-    font-size: 14px;
-    font-weight: 700;
-  }
-
-  .disclaimer {
-    margin-top: 18px;
-    font-size: 11.5px;
-    color: var(--tg-theme-hint-color, var(--hint-color));
-    line-height: 1.5;
-    text-align: center;
-    padding: 0 8px;
-  }
-</style>
-</head>
-<body>
-
-<div class="header">
-  <h1>📊 Forex TG</h1>
-  <p>Выбери актив и таймфрейм для анализа</p>
-</div>
-
-<div class="ticker-wrap">
-  <div class="ticker-track" id="tickerTrack"></div>
-</div>
-
-<div class="tabs">
-  <div class="tab active" data-category="forex">💱 Форекс</div>
-  <div class="tab" data-category="crypto">₿ Крипта</div>
-  <div class="tab" data-category="stocks">📈 Акции</div>
-  <div class="tab" data-category="otc">🕐 OTC</div>
-</div>
-
-<div class="section-label">Актив</div>
-<input type="text" class="search-box" id="customSymbol" placeholder="Или впиши любой тикер вручную, напр. USD/SEK" />
-<div class="asset-grid" id="assetGrid"></div>
-
-<div class="section-label">Таймфрейм</div>
-<div class="tf-grid" id="tfGrid">
-  <div class="tf-card" data-tf="1min">1м</div>
-  <div class="tf-card selected" data-tf="5min">5м</div>
-  <div class="tf-card" data-tf="15min">15м</div>
-  <div class="tf-card" data-tf="30min">30м</div>
-</div>
-
-<button class="submit-btn" id="submitBtn">Получить сигнал</button>
-<button class="scan-btn" id="scanBtn">🔎 Умный скан категории</button>
-
-<!-- Экран загрузки -->
-<div class="loading-screen" id="loadingScreen">
-  <div class="ring-loader"><div class="ring-core"></div></div>
-  <div class="loading-title">Анализирую сигнал</div>
-  <div class="loading-sub" id="loadingSub">EUR/USD · 5м</div>
-</div>
-
-<!-- Карточка результата -->
-<div class="result-sheet" id="resultSheet">
-  <div class="handle"></div>
-  <div class="result-status" id="resultStatus">Сигнал готов</div>
-  <div class="result-pair" id="resultPair">EUR/USD</div>
-  <div class="result-confidence" id="resultConfidence">Уверенность: 4/5 индикаторов</div>
-
-  <button class="result-action-btn buy" id="resultActionBtn">
-    <span id="resultArrow">↑</span>
-    <span id="resultActionText">ПОКУПКА</span>
-  </button>
-
-  <div class="result-info">
-    <div class="result-info-row">
-      <span class="label">Рынок</span>
-      <span class="value" id="resultMarket">Форекс</span>
-    </div>
-    <div class="result-info-row">
-      <span class="label">Таймфрейм</span>
-      <span class="value" id="resultTf">5 минут</span>
-    </div>
-    <div class="result-info-row">
-      <span class="label">Цена</span>
-      <span class="value" id="resultPrice">1.08542</span>
-    </div>
-  </div>
-
-  <div class="result-reason" id="resultReason"></div>
-
-  <button class="result-close-btn" id="resultCloseBtn">Закрыть</button>
-</div>
-
-<!-- Экран результатов скана -->
-<div class="scan-sheet" id="scanSheet">
-  <div class="handle"></div>
-  <h2>🔎 Умный скан</h2>
-  <div class="scan-sub" id="scanSub">Форекс · 5м</div>
-  <div id="scanResultsList"></div>
-  <button class="result-close-btn" id="scanCloseBtn" style="margin-top: 10px;">Закрыть</button>
-</div>
-
-<p class="disclaimer">
-  Сигналы основаны на техническом анализе (EMA, MACD, ADX, RSI) и не гарантируют
-  результат. Никакая стратегия не даёт гарантированно высокую проходимость на
-  коротких таймфреймах — торгуй на свой риск.
-</p>
-
-<script>
-  const tg = window.Telegram.WebApp;
-  tg.expand();
-
-  const ASSETS = {
-    forex: [
-      { icon: "🇪🇺🇺🇸", name: "EUR/USD", symbol: "EUR/USD" },
-      { icon: "🇬🇧🇺🇸", name: "GBP/USD", symbol: "GBP/USD" },
-      { icon: "🇺🇸🇯🇵", name: "USD/JPY", symbol: "USD/JPY" },
-      { icon: "🇦🇺🇺🇸", name: "AUD/USD", symbol: "AUD/USD" },
-      { icon: "🇺🇸🇨🇦", name: "USD/CAD", symbol: "USD/CAD" },
-      { icon: "🇺🇸🇨🇭", name: "USD/CHF", symbol: "USD/CHF" },
-      { icon: "🇳🇿🇺🇸", name: "NZD/USD", symbol: "NZD/USD" },
-      { icon: "🇪🇺🇬🇧", name: "EUR/GBP", symbol: "EUR/GBP" },
-      { icon: "🇪🇺🇯🇵", name: "EUR/JPY", symbol: "EUR/JPY" },
-      { icon: "🇬🇧🇯🇵", name: "GBP/JPY", symbol: "GBP/JPY" },
-      { icon: "🇪🇺🇨🇭", name: "EUR/CHF", symbol: "EUR/CHF" },
-      { icon: "🇪🇺🇦🇺", name: "EUR/AUD", symbol: "EUR/AUD" },
-      { icon: "🇪🇺🇨🇦", name: "EUR/CAD", symbol: "EUR/CAD" },
-      { icon: "🇬🇧🇨🇭", name: "GBP/CHF", symbol: "GBP/CHF" },
-      { icon: "🇬🇧🇦🇺", name: "GBP/AUD", symbol: "GBP/AUD" },
-      { icon: "🇬🇧🇨🇦", name: "GBP/CAD", symbol: "GBP/CAD" },
-      { icon: "🇦🇺🇯🇵", name: "AUD/JPY", symbol: "AUD/JPY" },
-      { icon: "🇦🇺🇳🇿", name: "AUD/NZD", symbol: "AUD/NZD" },
-      { icon: "🇦🇺🇨🇦", name: "AUD/CAD", symbol: "AUD/CAD" },
-      { icon: "🇨🇦🇯🇵", name: "CAD/JPY", symbol: "CAD/JPY" },
-      { icon: "🇨🇭🇯🇵", name: "CHF/JPY", symbol: "CHF/JPY" },
-      { icon: "🇳🇿🇯🇵", name: "NZD/JPY", symbol: "NZD/JPY" },
-      { icon: "🇺🇸🇹🇷", name: "USD/TRY", symbol: "USD/TRY" },
-      { icon: "🇺🇸🇿🇦", name: "USD/ZAR", symbol: "USD/ZAR" },
-      { icon: "🇺🇸🇲🇽", name: "USD/MXN", symbol: "USD/MXN" },
-      { icon: "🇺🇸🇸🇪", name: "USD/SEK", symbol: "USD/SEK" },
-      { icon: "🇺🇸🇳🇴", name: "USD/NOK", symbol: "USD/NOK" },
-      { icon: "🇺🇸🇸🇬", name: "USD/SGD", symbol: "USD/SGD" },
-      { icon: "🇺🇸🇭🇰", name: "USD/HKD", symbol: "USD/HKD" },
-      { icon: "🇺🇸🇮🇳", name: "USD/INR", symbol: "USD/INR" },
-    ],
-    crypto: [
-      { icon: "₿", name: "BTC/USD", symbol: "BTC/USD" },
-      { icon: "Ξ", name: "ETH/USD", symbol: "ETH/USD" },
-      { icon: "◎", name: "SOL/USD", symbol: "SOL/USD" },
-      { icon: "✕", name: "XRP/USD", symbol: "XRP/USD" },
-      { icon: "Ð", name: "DOGE/USD", symbol: "DOGE/USD" },
-      { icon: "🔷", name: "BNB/USD", symbol: "BNB/USD" },
-      { icon: "🅰", name: "ADA/USD", symbol: "ADA/USD" },
-      { icon: "🔺", name: "AVAX/USD", symbol: "AVAX/USD" },
-      { icon: "●", name: "DOT/USD", symbol: "DOT/USD" },
-      { icon: "🔗", name: "LINK/USD", symbol: "LINK/USD" },
-      { icon: "Ł", name: "LTC/USD", symbol: "LTC/USD" },
-      { icon: "▲", name: "MATIC/USD", symbol: "MATIC/USD" },
-      { icon: "🌐", name: "ATOM/USD", symbol: "ATOM/USD" },
-      { icon: "🦄", name: "UNI/USD", symbol: "UNI/USD" },
-      { icon: "Ð", name: "SHIB/USD", symbol: "SHIB/USD" },
-      { icon: "🐙", name: "TRX/USD", symbol: "TRX/USD" },
-      { icon: "🌊", name: "NEAR/USD", symbol: "NEAR/USD" },
-      { icon: "🔶", name: "XLM/USD", symbol: "XLM/USD" },
-      { icon: "🧬", name: "ETC/USD", symbol: "ETC/USD" },
-      { icon: "🎯", name: "FIL/USD", symbol: "FIL/USD" },
-    ],
-    stocks: [
-      { icon: "🍎", name: "Apple", symbol: "AAPL" },
-      { icon: "🪟", name: "Microsoft", symbol: "MSFT" },
-      { icon: "🔍", name: "Google", symbol: "GOOGL" },
-      { icon: "📦", name: "Amazon", symbol: "AMZN" },
-      { icon: "🚗", name: "Tesla", symbol: "TSLA" },
-      { icon: "💻", name: "Nvidia", symbol: "NVDA" },
-      { icon: "📘", name: "Meta", symbol: "META" },
-      { icon: "🎬", name: "Netflix", symbol: "NFLX" },
-      { icon: "💳", name: "Visa", symbol: "V" },
-      { icon: "🏦", name: "JPMorgan", symbol: "JPM" },
-      { icon: "🥤", name: "Coca-Cola", symbol: "KO" },
-      { icon: "🍔", name: "McDonald's", symbol: "MCD" },
-      { icon: "👟", name: "Nike", symbol: "NKE" },
-      { icon: "💊", name: "Pfizer", symbol: "PFE" },
-      { icon: "✈️", name: "Boeing", symbol: "BA" },
-      { icon: "🛢️", name: "ExxonMobil", symbol: "XOM" },
-      { icon: "🏭", name: "AMD", symbol: "AMD" },
-      { icon: "🎮", name: "Sony", symbol: "SONY" },
-      { icon: "☕", name: "Starbucks", symbol: "SBUX" },
-      { icon: "🛒", name: "Walmart", symbol: "WMT" },
-    ],
-    otc: [
-      { icon: "🕐", name: "EUR/USD ОТС", symbol: "EUR/USD ОТС" },
-      { icon: "🕐", name: "GBP/USD ОТС", symbol: "GBP/USD ОТС" },
-      { icon: "🕐", name: "USD/JPY ОТС", symbol: "USD/JPY ОТС" },
-      { icon: "🕐", name: "AUD/USD ОТС", symbol: "AUD/USD ОТС" },
-      { icon: "🕐", name: "USD/CAD ОТС", symbol: "USD/CAD ОТС" },
-      { icon: "🕐", name: "NZD/USD ОТС", symbol: "NZD/USD ОТС" },
-      { icon: "🕐", name: "EUR/JPY ОТС", symbol: "EUR/JPY ОТС" },
-      { icon: "🕐", name: "GBP/JPY ОТС", symbol: "GBP/JPY ОТС" },
-    ],
-  };
-
-  let currentCategory = "forex";
-  let selectedSymbol = ASSETS.forex[0].symbol;
-  let selectedTimeframe = "5min";
-
-  function renderAssets() {
-    const grid = document.getElementById("assetGrid");
-    grid.innerHTML = "";
-    ASSETS[currentCategory].forEach((asset, i) => {
-      const card = document.createElement("div");
-      card.className = "asset-card" + (asset.symbol === selectedSymbol ? " selected" : "");
-      card.innerHTML = `<span class="icon">${asset.icon}</span><span class="name">${asset.name}</span>`;
-      card.addEventListener("click", () => {
-        selectedSymbol = asset.symbol;
-        document.getElementById("customSymbol").value = "";
-        renderAssets();
-      });
-      grid.appendChild(card);
-    });
-  }
-
-  document.getElementById("customSymbol").addEventListener("input", (e) => {
-    if (e.target.value.trim() !== "") {
-      selectedSymbol = e.target.value.trim().toUpperCase();
-      document.querySelectorAll(".asset-card").forEach(c => c.classList.remove("selected"));
-    } else {
-      selectedSymbol = ASSETS[currentCategory][0].symbol;
-      renderAssets();
-    }
-  });
-
-  document.querySelectorAll(".tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      currentCategory = tab.dataset.category;
-      selectedSymbol = ASSETS[currentCategory][0].symbol;
-      renderAssets();
-    });
-  });
-
-  document.querySelectorAll(".tf-card").forEach(card => {
-    card.addEventListener("click", () => {
-      document.querySelectorAll(".tf-card").forEach(c => c.classList.remove("selected"));
-      card.classList.add("selected");
-      selectedTimeframe = card.dataset.tf;
-    });
-  });
-
-  document.getElementById("submitBtn").addEventListener("click", () => {
-    runSignalAnalysis();
-  });
-
-  document.getElementById("scanBtn").addEventListener("click", () => {
-    runSmartScan();
-  });
-
-  document.getElementById("resultCloseBtn").addEventListener("click", () => {
-    document.getElementById("resultSheet").classList.remove("active");
-  });
-
-  document.getElementById("scanCloseBtn").addEventListener("click", () => {
-    document.getElementById("scanSheet").classList.remove("active");
-  });
-
-  // ============================================================
-  // Клиентский анализ — та же логика, что в боте (EMA/RSI/MACD/
-  // ADX/Bollinger/Stochastic/CCI/Williams %R), считается прямо
-  // внутри мини-аппа, чтобы показать анимацию и карточку сразу.
-  // ============================================================
-
-  const TWELVE_DATA_API_KEY = "1f3aeced1bfb4c2e9ad204309d592761";
-
-  const EMA_FAST = 9, EMA_SLOW = 21, RSI_PERIOD = 14;
-  const RSI_OVERBOUGHT = 75, RSI_OVERSOLD = 25;
-  const ADX_PERIOD = 14, ADX_TREND_THRESHOLD = 15;
-  const BB_PERIOD = 20, BB_STD = 2;
-  const STOCH_K = 14, STOCH_D = 3, STOCH_OB = 80, STOCH_OS = 20;
-  const CCI_PERIOD = 20, CCI_OB = 100, CCI_OS = -100;
-  const WILLR_PERIOD = 14, WILLR_OB = -20, WILLR_OS = -80;
-  const MIN_VOTES = 3;
-
-  function emaArr(values, period) {
-    const k = 2 / (period + 1);
-    const out = [values[0]];
-    for (let i = 1; i < values.length; i++) out.push(values[i] * k + out[i - 1] * (1 - k));
-    return out;
-  }
-
-  function smaArr(values, period) {
-    return values.map((_, i) => {
-      if (i < period - 1) return NaN;
-      let sum = 0;
-      for (let j = i - period + 1; j <= i; j++) sum += values[j];
-      return sum / period;
-    });
-  }
-
-  function rsiArr(closes, period) {
-    const gains = [0], losses = [0];
-    for (let i = 1; i < closes.length; i++) {
-      const d = closes[i] - closes[i - 1];
-      gains.push(Math.max(d, 0));
-      losses.push(Math.max(-d, 0));
-    }
-    const avgGain = smaArr(gains, period), avgLoss = smaArr(losses, period);
-    return closes.map((_, i) => {
-      if (isNaN(avgGain[i]) || isNaN(avgLoss[i]) || avgLoss[i] === 0) return 50;
-      const rs = avgGain[i] / avgLoss[i];
-      return 100 - 100 / (1 + rs);
-    });
-  }
-
-  function macdHist(closes) {
-    const emaFast = emaArr(closes, 12), emaSlow = emaArr(closes, 26);
-    const macdLine = closes.map((_, i) => emaFast[i] - emaSlow[i]);
-    const signalLine = emaArr(macdLine, 9);
-    return macdLine.map((v, i) => v - signalLine[i]);
-  }
-
-  function adxArr(highs, lows, closes, period) {
-    const plusDM = [0], minusDM = [0], tr = [0];
-    for (let i = 1; i < highs.length; i++) {
-      const upMove = highs[i] - highs[i - 1];
-      const downMove = lows[i - 1] - lows[i];
-      plusDM.push(upMove > downMove && upMove > 0 ? upMove : 0);
-      minusDM.push(downMove > upMove && downMove > 0 ? downMove : 0);
-      tr.push(Math.max(highs[i] - lows[i], Math.abs(highs[i] - closes[i - 1]), Math.abs(lows[i] - closes[i - 1])));
-    }
-    const atr = smaArr(tr, period);
-    const plusDI = plusDM.map((v, i) => 100 * (smaArr(plusDM, period)[i] / atr[i]));
-    const minusDI = minusDM.map((v, i) => 100 * (smaArr(minusDM, period)[i] / atr[i]));
-    const dx = plusDI.map((v, i) => 100 * Math.abs(v - minusDI[i]) / (v + minusDI[i]));
-    return smaArr(dx, period).map(v => isNaN(v) ? 0 : v);
-  }
-
-  function bollinger(closes, period, numStd) {
-    const mid = smaArr(closes, period);
-    const std = closes.map((_, i) => {
-      if (i < period - 1) return NaN;
-      const slice = closes.slice(i - period + 1, i + 1);
-      const mean = slice.reduce((a, b) => a + b, 0) / period;
-      const variance = slice.reduce((a, b) => a + (b - mean) ** 2, 0) / period;
-      return Math.sqrt(variance);
-    });
-    return {
-      upper: mid.map((m, i) => m + numStd * std[i]),
-      lower: mid.map((m, i) => m - numStd * std[i]),
-    };
-  }
-
-  function stochasticArr(highs, lows, closes, kPeriod, dPeriod) {
-    const k = closes.map((c, i) => {
-      if (i < kPeriod - 1) return 50;
-      const hh = Math.max(...highs.slice(i - kPeriod + 1, i + 1));
-      const ll = Math.min(...lows.slice(i - kPeriod + 1, i + 1));
-      return hh === ll ? 50 : 100 * (c - ll) / (hh - ll);
-    });
-    const d = smaArr(k, dPeriod).map(v => isNaN(v) ? 50 : v);
-    return { k, d };
-  }
-
-  function cciArr(highs, lows, closes, period) {
-    const tp = closes.map((c, i) => (highs[i] + lows[i] + c) / 3);
-    const sma = smaArr(tp, period);
-    return tp.map((v, i) => {
-      if (i < period - 1) return 0;
-      const slice = tp.slice(i - period + 1, i + 1);
-      const meanDev = slice.reduce((a, b) => a + Math.abs(b - sma[i]), 0) / period;
-      return meanDev === 0 ? 0 : (v - sma[i]) / (0.015 * meanDev);
-    });
-  }
-
-  function williamsRArr(highs, lows, closes, period) {
-    return closes.map((c, i) => {
-      if (i < period - 1) return -50;
-      const hh = Math.max(...highs.slice(i - period + 1, i + 1));
-      const ll = Math.min(...lows.slice(i - period + 1, i + 1));
-      return hh === ll ? -50 : -100 * (hh - c) / (hh - ll);
-    });
-  }
-
-  async function fetchCandles(symbol, timeframe) {
-    const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(symbol)}&interval=${timeframe}&outputsize=60&apikey=${TWELVE_DATA_API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    if (!data.values) throw new Error(data.message || "Не удалось получить данные");
-    const values = data.values.slice().reverse(); // Twelve Data отдаёт от новых к старым — разворачиваем
-    return {
-      time: values.map(v => v.datetime),
-      open: values.map(v => parseFloat(v.open)),
-      high: values.map(v => parseFloat(v.high)),
-      low: values.map(v => parseFloat(v.low)),
-      close: values.map(v => parseFloat(v.close)),
-    };
-  }
-
-  function runIndicatorAnalysis(candles) {
-    const { high, low, close } = candles;
-    const n = close.length - 1;
-
-    const emaFast = emaArr(close, EMA_FAST);
-    const emaSlow = emaArr(close, EMA_SLOW);
-    const rsi = rsiArr(close, RSI_PERIOD);
-    const hist = macdHist(close);
-    const adx = adxArr(high, low, close, ADX_PERIOD);
-    const bb = bollinger(close, BB_PERIOD, BB_STD);
-    const stoch = stochasticArr(high, low, close, STOCH_K, STOCH_D);
-    const cci = cciArr(high, low, close, CCI_PERIOD);
-    const willr = williamsRArr(high, low, close, WILLR_PERIOD);
-
-    const trendUp = emaFast[n] > emaSlow[n];
-    const trendDown = emaFast[n] < emaSlow[n];
-    const strongTrend = adx[n] > ADX_TREND_THRESHOLD;
-
-    if (!strongTrend) {
-      return {
-        signal: null,
-        reason: `Слабый тренд (ADX=${adx[n].toFixed(1)}) — рынок в боковике, сигнал не даю.`,
-        price: close[n],
-      };
-    }
-
-    let bullVotes = 0, bearVotes = 0;
-    const details = [];
-
-    if (rsi[n] < RSI_OVERBOUGHT && rsi[n] > 50) { bullVotes++; details.push(`RSI=${rsi[n].toFixed(1)} — бычий`); }
-    else if (rsi[n] > RSI_OVERSOLD && rsi[n] < 50) { bearVotes++; details.push(`RSI=${rsi[n].toFixed(1)} — медвежий`); }
-
-    if (hist[n] > 0) { bullVotes++; details.push("MACD — моментум вверх"); }
-    else if (hist[n] < 0) { bearVotes++; details.push("MACD — моментум вниз"); }
-
-    if (stoch.k[n] > stoch.d[n] && stoch.k[n] < STOCH_OB) { bullVotes++; details.push(`Stochastic K=${stoch.k[n].toFixed(1)} — бычий`); }
-    else if (stoch.k[n] < stoch.d[n] && stoch.k[n] > STOCH_OS) { bearVotes++; details.push(`Stochastic K=${stoch.k[n].toFixed(1)} — медвежий`); }
-
-    if (cci[n] > 0 && cci[n] < CCI_OB) { bullVotes++; details.push(`CCI=${cci[n].toFixed(1)} — бычий`); }
-    else if (cci[n] < 0 && cci[n] > CCI_OS) { bearVotes++; details.push(`CCI=${cci[n].toFixed(1)} — медвежий`); }
-
-    if (willr[n] > WILLR_OS && willr[n] < WILLR_OB && willr[n] > -50) { bullVotes++; details.push(`Williams %R=${willr[n].toFixed(1)} — бычий`); }
-    else if (willr[n] < WILLR_OB && willr[n] > WILLR_OS && willr[n] < -50) { bearVotes++; details.push(`Williams %R=${willr[n].toFixed(1)} — медвежий`); }
-
-    let bbPos = "цена внутри полос Боллинджера";
-    if (close[n] > bb.upper[n]) bbPos = "цена выше верхней полосы Боллинджера (перекупленность)";
-    else if (close[n] < bb.lower[n]) bbPos = "цена ниже нижней полосы Боллинджера (перепроданность)";
-
-    let signal = null;
-    const reasonLines = [];
-
-    if (trendUp && bullVotes >= MIN_VOTES) {
-      signal = "CALL";
-      reasonLines.push(`Тренд восходящий (EMA${EMA_FAST} > EMA${EMA_SLOW})`);
-      reasonLines.push(`ADX=${adx[n].toFixed(1)} — тренд достаточно сильный`);
-      reasonLines.push(...details);
-      reasonLines.push(`Bollinger: ${bbPos}`);
-      reasonLines.push(`Голосов за рост: ${bullVotes}/5`);
-    } else if (trendDown && bearVotes >= MIN_VOTES) {
-      signal = "PUT";
-      reasonLines.push(`Тренд нисходящий (EMA${EMA_FAST} < EMA${EMA_SLOW})`);
-      reasonLines.push(`ADX=${adx[n].toFixed(1)} — тренд достаточно сильный`);
-      reasonLines.push(...details);
-      reasonLines.push(`Bollinger: ${bbPos}`);
-      reasonLines.push(`Голосов за падение: ${bearVotes}/5`);
-    } else {
-      reasonLines.push(`Недостаточно согласия индикаторов (за рост: ${bullVotes}/5, за падение: ${bearVotes}/5, нужно ${MIN_VOTES}) — сигнал не даю`);
-    }
-
-    return { signal, reason: reasonLines.join("\n"), price: close[n], votes: Math.max(bullVotes, bearVotes) };
-  }
-
-  const SCAN_ASSETS = {
-    forex: ["EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "USD/CAD", "EUR/JPY"],
-    crypto: ["BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD", "BNB/USD", "ADA/USD"],
-    stocks: ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA"],
-    otc: ["EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "USD/CAD", "EUR/JPY"],
-  };
-
-  async function runSmartScan() {
-    const loadingScreen = document.getElementById("loadingScreen");
-    const loadingSub = document.getElementById("loadingSub");
-    const tfLabel = { "1min": "1м", "5min": "5м", "15min": "15м", "30min": "30м" }[selectedTimeframe];
-    const categoryLabel = { forex: "Форекс", crypto: "Крипта", stocks: "Акции", otc: "OTC" }[currentCategory] || "";
-    const symbols = SCAN_ASSETS[currentCategory] || SCAN_ASSETS.forex;
-
-    loadingScreen.classList.add("active");
-    document.querySelector(".loading-title").textContent = "Умный скан";
-
-    const results = [];
-
-    for (let i = 0; i < symbols.length; i++) {
-      loadingSub.textContent = `Проверено ${i}/${symbols.length} · ${symbols[i]}`;
-      try {
-        const candles = await fetchCandles(symbols[i], selectedTimeframe);
-        const result = runIndicatorAnalysis(candles);
-        if (result.signal) results.push({ symbol: symbols[i], ...result });
-      } catch (err) {
-        // пропускаем актив, если по нему не удалось получить данные
-      }
-      await new Promise(r => setTimeout(r, 250)); // небольшая пауза между запросами к API
-    }
-
-    document.querySelector(".loading-title").textContent = "Анализирую сигнал"; // возвращаем подпись по умолчанию
-    loadingScreen.classList.remove("active");
-
-    showScanResults(results, categoryLabel, tfLabel, symbols.length);
-  }
-
-  function showScanResults(results, categoryLabel, tfLabel, totalChecked) {
-    document.getElementById("scanSub").textContent = `${categoryLabel} · ${tfLabel} · проверено ${totalChecked}`;
-    const list = document.getElementById("scanResultsList");
-
-    if (results.length === 0) {
-      list.innerHTML = `<div class="scan-empty">Сейчас нет активов с чётким сигналом —<br>рынок в боковике или индикаторы не согласуются.</div>`;
-    } else {
-      list.innerHTML = results.map(r => {
-        const isBuy = r.signal === "CALL";
-        return `
-          <div class="scan-result-item">
-            <div>
-              <div class="name">${r.symbol}</div>
-              <div style="font-size:11.5px;color:var(--hint-color);margin-top:2px;">${r.votes}/5 индикаторов · цена ${r.price.toFixed(5)}</div>
-            </div>
-            <div class="badge ${isBuy ? "buy" : "sell"}">${isBuy ? "↑ ПОКУПКА" : "↓ ПРОДАЖА"}</div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    document.getElementById("scanSheet").classList.add("active");
-  }
-
-  async function runSignalAnalysis() {
-    const loadingScreen = document.getElementById("loadingScreen");
-    const loadingSub = document.getElementById("loadingSub");
-    const tfLabel = { "1min": "1м", "5min": "5м", "15min": "15м", "30min": "30м" }[selectedTimeframe];
-
-    loadingSub.textContent = `${selectedSymbol} · ${tfLabel}`;
-    loadingScreen.classList.add("active");
-
-    const minDisplayTime = new Promise(resolve => setTimeout(resolve, 1400)); // чтобы анимация не мигала слишком быстро
-
-    try {
-      const [candles] = await Promise.all([fetchCandles(selectedSymbol, selectedTimeframe), minDisplayTime]);
-      const result = runIndicatorAnalysis(candles);
-      showResultSheet(result, tfLabel);
-    } catch (err) {
-      await minDisplayTime;
-      loadingScreen.classList.remove("active");
-      alert("Ошибка получения данных: " + err.message);
-      return;
-    }
-
-    loadingScreen.classList.remove("active");
-  }
-
-  function showResultSheet(result, tfLabel) {
-    const sheet = document.getElementById("resultSheet");
-    const categoryLabel = { forex: "Форекс", crypto: "Крипта", stocks: "Акции", otc: "OTC" }[currentCategory] || "";
-
-    document.getElementById("resultPair").textContent = selectedSymbol;
-    document.getElementById("resultMarket").textContent = categoryLabel;
-    document.getElementById("resultTf").textContent = tfLabel;
-    document.getElementById("resultPrice").textContent = result.price.toFixed(5);
-    document.getElementById("resultReason").textContent = result.reason;
-
-    const btn = document.getElementById("resultActionBtn");
-    const arrow = document.getElementById("resultArrow");
-    const actionText = document.getElementById("resultActionText");
-    const status = document.getElementById("resultStatus");
-    const confidence = document.getElementById("resultConfidence");
-
-    btn.classList.remove("buy", "sell", "neutral");
-
-    if (result.signal === "CALL") {
-      status.textContent = "Сигнал готов";
-      btn.classList.add("buy");
-      arrow.textContent = "↑";
-      actionText.textContent = "ПОКУПКА";
-      confidence.textContent = `Уверенность: ${result.votes}/5 индикаторов согласны`;
-    } else if (result.signal === "PUT") {
-      status.textContent = "Сигнал готов";
-      btn.classList.add("sell");
-      arrow.textContent = "↓";
-      actionText.textContent = "ПРОДАЖА";
-      confidence.textContent = `Уверенность: ${result.votes}/5 индикаторов согласны`;
-    } else {
-      status.textContent = "Сигнала нет";
-      btn.classList.add("neutral");
-      arrow.textContent = "–";
-      actionText.textContent = "НЕТ СИГНАЛА";
-      confidence.textContent = "Индикаторы не согласуются — рынок неопределённый";
-    }
-
-    sheet.classList.add("active");
-  }
-
-  // Бегущая строка сверху — просто список доступных активов текущей категории, без выдуманных цифр
-  function renderTicker() {
-    const track = document.getElementById("tickerTrack");
-    const allSymbols = [...ASSETS.forex, ...ASSETS.crypto, ...ASSETS.stocks];
-    const items = allSymbols.map(a => `<span class="ticker-item"><span class="dot"></span>${a.name}</span>`).join("");
-    track.innerHTML = items + items; // дублируем для бесшовной прокрутки
-  }
-
-  renderTicker();
-  renderAssets();
-</script>
-
-</body>
-</html>
+  .result-sheet .handle { width: 40px; height: 4px; border-radius:
