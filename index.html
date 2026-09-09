@@ -6,23 +6,17 @@
 <title>Forex TG</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  /* ============================================
-     🎨 ЗОНА НАСТРОЙКИ ЦВЕТОВ — меняй только тут
-     ============================================ */
   :root {
     color-scheme: light dark;
-
-    --accent-1: #4facfe;      /* основной цвет градиента (кнопки, акценты) */
-    --accent-2: #00f2fe;      /* второй цвет градиента */
-    --bg-color: #0f1117;      /* фон приложения */
-    --bg-glow-1: #1a2a6c;     /* цветное пятно на фоне (левый верх) */
-    --bg-glow-2: #2b0f54;     /* цветное пятно на фоне (правый низ) */
-    --card-bg: rgba(255,255,255,0.06);   /* фон карточек активов */
+    --accent-1: #f5f5f5;
+    --accent-2: #9e9e9e;
+    --bg-color: #060606;
+    --bg-glow-1: #2b2b2b;
+    --bg-glow-2: #1a1a1a;
+    --card-bg: rgba(255,255,255,0.06);
     --text-color: #ffffff;
-    --hint-color: #8b8f9a;
+    --hint-color: #8b8b8b;
   }
-  /* ============================================ */
-
   * { box-sizing: border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
@@ -37,11 +31,7 @@
       radial-gradient(circle at 85% 90%, var(--bg-glow-2) 0%, transparent 45%);
     background-attachment: fixed;
   }
-
-  .header {
-    text-align: center;
-    margin-bottom: 20px;
-  }
+  .header { text-align: center; margin-bottom: 20px; }
   .header h1 {
     font-size: 22px;
     margin: 0 0 4px 0;
@@ -50,117 +40,52 @@
     -webkit-text-fill-color: transparent;
     font-weight: 800;
   }
-  .header p {
-    color: var(--tg-theme-hint-color, var(--hint-color));
-    font-size: 13px;
-    margin: 0;
-  }
-
-  /* Вкладки категорий активов */
+  .header p { color: var(--tg-theme-hint-color, var(--hint-color)); font-size: 13px; margin: 0; }
   .tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    background: rgba(255,255,255,0.05);
-    padding: 4px;
-    border-radius: 14px;
+    display: flex; gap: 8px; margin-bottom: 16px;
+    background: rgba(255,255,255,0.05); padding: 4px; border-radius: 14px;
   }
   .tab {
-    flex: 1;
-    text-align: center;
-    padding: 10px 4px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--tg-theme-hint-color, var(--hint-color));
-    cursor: pointer;
-    transition: all 0.2s;
+    flex: 1; text-align: center; padding: 10px 4px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; color: var(--tg-theme-hint-color, var(--hint-color));
+    cursor: pointer; transition: all 0.2s;
   }
-  .tab.active {
-    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-    color: var(--bg-color);
-  }
-
+  .tab.active { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: var(--bg-color); }
   .section-label {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--tg-theme-hint-color, var(--hint-color));
-    margin: 16px 0 8px 2px;
-    font-weight: 700;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--tg-theme-hint-color, var(--hint-color)); margin: 16px 0 8px 2px; font-weight: 700;
   }
-
-  .asset-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
+  .asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .asset-card {
-    padding: 14px 10px;
-    border-radius: 14px;
-    background: var(--card-bg);
-    border: 1.5px solid transparent;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all 0.15s;
+    padding: 14px 10px; border-radius: 14px; background: var(--card-bg);
+    border: 1.5px solid transparent; display: flex; align-items: center; gap: 8px;
+    cursor: pointer; transition: all 0.15s;
   }
-  .asset-card .icon {
-    font-size: 20px;
-  }
-  .asset-card .name {
-    font-size: 14px;
-    font-weight: 600;
-  }
+  .asset-card .icon { font-size: 20px; }
+  .asset-card .name { font-size: 14px; font-weight: 600; }
   .asset-card.selected {
     border-color: var(--accent-1);
-    background: linear-gradient(135deg, rgba(79,172,254,0.18), rgba(0,242,254,0.10));
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(200,200,200,0.08));
   }
-
-  .tf-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
+  .tf-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .tf-card {
-    text-align: center;
-    padding: 12px 4px;
-    border-radius: 12px;
-    background: var(--card-bg);
-    border: 1.5px solid transparent;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
+    text-align: center; padding: 12px 4px; border-radius: 12px; background: var(--card-bg);
+    border: 1.5px solid transparent; font-size: 14px; font-weight: 700; cursor: pointer;
   }
   .tf-card.selected {
     border-color: var(--accent-1);
-    background: linear-gradient(135deg, rgba(79,172,254,0.18), rgba(0,242,254,0.10));
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(200,200,200,0.08));
   }
-
   .submit-btn {
-    margin-top: 24px;
-    width: 100%;
-    padding: 16px;
-    font-size: 16px;
-    font-weight: 800;
-    border: none;
-    border-radius: 16px;
+    margin-top: 24px; width: 100%; padding: 16px; font-size: 16px; font-weight: 800;
+    border: none; border-radius: 16px;
     background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-    color: var(--bg-color);
-    box-shadow: 0 6px 20px rgba(79,172,254,0.35);
+    color: var(--bg-color); box-shadow: 0 6px 20px rgba(255,255,255,0.20);
   }
-  .submit-btn:active {
-    transform: scale(0.98);
-  }
-
+  .submit-btn:active { transform: scale(0.98); }
   .disclaimer {
-    margin-top: 18px;
-    font-size: 11.5px;
-    color: var(--tg-theme-hint-color, var(--hint-color));
-    line-height: 1.5;
-    text-align: center;
-    padding: 0 8px;
+    margin-top: 18px; font-size: 11.5px; color: var(--tg-theme-hint-color, var(--hint-color));
+    line-height: 1.5; text-align: center; padding: 0 8px;
   }
 </style>
 </head>
